@@ -1,5 +1,6 @@
 const gulp = require('gulp');
 const plugins = require('gulp-load-plugins')();
+const autoprefixer = require('autoprefixer');
 const del = require('del');
 const mergeStream = require('merge-stream');
 const util = require('gulp-util');
@@ -25,6 +26,7 @@ gulp.task('css', () => {
         .pipe(plugins.sass.sync().on('error', plugins.sass.logError))
         .pipe(plugins.sourcemaps.init())
         .pipe(plugins.sass({ outputStyle: 'compressed' }))
+        .pipe(plugins.postcss([autoprefixer({browsers: ['> 1%'], cascade: false})]))
         .pipe(plugins.sourcemaps.write('./'))
         .pipe(gulp.dest('build/css/'));
 });
