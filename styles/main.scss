@@ -1,5 +1,12 @@
 @import 'common';
 
+$responsive-sub-break-point: 600px;
+$responsive-main-break-point: 630px;
+$card-border-radius: 5px;
+$main-box-shadow: 0 4px 5px 0 rgba(0,0,0,0.14),
+             0 1px 10px 0 rgba(0,0,0,0.12),
+             0 2px 4px -1px rgba(0,0,0,0.3);
+
 /* ====================== Restaurant Filtering ====================== */
 .filter-options {
   width: 100%;
@@ -10,7 +17,7 @@
 
     display: none;
 
-    @media screen and (min-width: 600px) {
+    @media screen and (min-width: $responsive-sub-break-point) {
       display: inline-block;
       color: white;
       font-size: 1rem;
@@ -42,11 +49,15 @@
   padding: 30px 15px 60px;
   text-align: center;
 
+  @media screen and (min-width: $responsive-main-break-point) {
+    display: flex;
+    flex-flow: row wrap;
+  }
+
   li {
     display: block;
     background-color: #fff;
-    border-bottom: 2px solid #ccc;
-    border-radius: $card-border-radius 0;
+    border-radius: $card-border-radius $card-border-radius 0 0;
     font-family: Arial,sans-serif;
     padding: 0;
     width: 100%;
@@ -56,16 +67,37 @@
       margin: 0;
     }
     overflow: hidden;
+    box-shadow: $main-box-shadow;
 
-    img {
-      width: 100%;
+    @media screen and (min-width: $responsive-main-break-point) {
+      width: 260px;
+      height: 480px;
+      margin: 10px 15px;
+      &:first-child {
+        margin: 10px 15px;
+      }
+    }
+
+    .restaurant-img {
+      background-color: #ccc;
+      display: block;
       margin: 0;
       padding: 0;
+      width: 100%;
+
+      @media screen and (min-width: $responsive-main-break-point) {
+        height: 60%;
+        object-fit: cover;
+      }
     }
 
     .restaurant-details {
-      width: 100%;
       padding: 10px;
+
+      @media screen and (min-width: $responsive-main-break-point) {
+        position: relative;
+        height: 40%;
+      }
     }
 
     h1 {
@@ -77,11 +109,31 @@
       line-height: 1.3;
       margin: 20px 0 10px;
       text-transform: uppercase;
+
+      @media screen and (min-width: $responsive-main-break-point) {
+        margin: 0;
+        height: 3em;
+      }
+    }
+
+    p {
+      margin: 0;
+      font-size: 11pt;
+
+      @media screen and (min-width: $responsive-main-break-point) {
+        &.neighborhood {
+          height: 1.5em;
+        }
+
+        &.address {
+          height: 3em;
+        }
+      }
     }
 
     a {
       background-color: orange;
-      border-bottom: 3px solid #eee;
+      box-shadow: $main-box-shadow;
       color: #fff;
       display: inline-block;
       font-size: 10pt;
@@ -91,19 +143,5 @@
       text-decoration: none;
       text-transform: uppercase;
     }
-  }
-
-  .restaurant-img {
-    background-color: #ccc;
-    display: block;
-    margin: 0;
-    max-width: 100%;
-    min-height: 248px;
-    min-width: 100%;
-  }
-
-  p {
-    margin: 0;
-    font-size: 11pt;
   }
 }
