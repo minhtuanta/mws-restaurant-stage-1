@@ -1,23 +1,35 @@
 @import 'variables';
 @import 'common';
 
-$responsive-main-break-point: 750px;
+$responsive-main-break-point: 950px;
 $content-left-indent: 30px;
 $page-border-radius: 25px;
 
+$big-screen-content-width: 50%;
+$big-screen-map-width: 100% - 50%;
+
 /* ====================== Breadcrumb ====================== */
 #breadcrumb {
-  padding: 10px $content-left-indent 16px;
   list-style: none;
   background-color: #eee;
   font-size: 20px;
+  padding: 0;
   margin: 0;
   width: 100%;
 
+  @media screen and (min-width: $responsive-main-break-point) {
+    width: $big-screen-content-width;
+  }
+
   /* Display list items side by side */
   li {
-    display: inline;
+    display: inline-block;
     font-size: 15px;
+    padding: 10px 0 16px 0;
+
+    &:first-child {
+      padding-left: $content-left-indent;
+    }
 
     /* Add a color to all links inside the list */
     a {
@@ -47,115 +59,137 @@ $page-border-radius: 25px;
     background: blue none repeat scroll 0 0;
     height: 400px;
     width: 100%;
+    padding: 0;
+    margin: 128px 0 0 0;
+
+    @media screen and (min-width: $responsive-main-break-point) {
+      width: $big-screen-map-width;
+      float: right;
+    }
+
+    #map {
+      background-color: #ccc;
+      height: 100%;
+      width: 100%;
+    }
   }
 
-  #map {
-    background-color: #ccc;
-    height: 100%;
-    width: 100%;
-  }
 
-  #restaurant-name {
-    color: #f18200;
-    font-family: Arial,sans-serif;
-    font-size: 25px;
-    font-weight: 200;
-    letter-spacing: 0;
-    margin: 30px 0 25px 0;
-    text-transform: uppercase;
-    line-height: 1.1;
-  }
-
-  #restaurant-img {
-    width: 100%;
-    border-radius: $page-border-radius 0 $page-border-radius 0;
-  }
-
-  #restaurant-cuisine {
-    background-color: #333;
-    color: #ddd;
-    font-size: 12pt;
-    font-weight: 300;
-    letter-spacing: 10px;
-    margin: 0 0 20px;
-    padding: 2px 0;
-    text-align: center;
-    text-transform: uppercase;
-    width: 100%;
-  }
-
-  #restaurant-address {
-    font-size: 12pt;
-    margin: 10px 0px;
-  }
 
   #restaurant-container, #reviews-container {
-    padding: 0 $content-left-indent;
+    padding: 0;
+    margin: 0;
+    @media screen and (min-width: $responsive-main-break-point) {
+      width: $big-screen-content-width;
+      float: left;
+    }
   }
 
-  #restaurant-hours td {
-    color: #666;
+  .restaurant-content-container {
+    padding: 0 $content-left-indent;
+
+    #restaurant-name {
+      color: #f18200;
+      font-family: Arial,sans-serif;
+      font-size: 25px;
+      font-weight: 200;
+      letter-spacing: 0;
+      margin: 30px 0 25px 0;
+      text-transform: uppercase;
+      line-height: 1.1;
+    }
+
+    #restaurant-img {
+      width: 100%;
+      border-radius: $page-border-radius 0 $page-border-radius 0;
+    }
+
+    #restaurant-cuisine {
+      background-color: #333;
+      color: #ddd;
+      font-size: 12pt;
+      font-weight: 300;
+      letter-spacing: 10px;
+      margin: 0 0 20px;
+      padding: 2px 0;
+      text-align: center;
+      text-transform: uppercase;
+      width: 100%;
+    }
+
+    #restaurant-address {
+      font-size: 12pt;
+      margin: 10px 0px;
+    }
+
+    #restaurant-hours td {
+      color: #666;
+    }
   }
 
   #reviews-container {
-    h2 {
-      color: #f58500;
-      font-size: 20px;
-      font-weight: 300;
-      letter-spacing: -1px;
-      margin: 20px 0 10px 0;
-    }
+    .reviews-content-container {
+      padding: 0 $content-left-indent;
 
-    #reviews-list {
-      margin: 0;
-      padding: 0;
+      h2 {
+        color: #f58500;
+        font-size: 20px;
+        font-weight: 300;
+        letter-spacing: -1px;
+        margin: 20px 0 10px 0;
+      }
 
-      li {
-        background-color: #fff;
-        display: block;
-        list-style-type: none;
-        margin: 0 0 25px;
-        overflow: hidden;
-        position: relative;
-        border-radius: $page-border-radius 0 $page-border-radius 0;
-        box-shadow: $main-box-shadow;
+      #reviews-list {
+        margin: 0;
+        padding: 0;
 
-        $review-horizontal-indent: 20px;
-
-        .review-header {
-          padding: 0 $review-horizontal-indent;
-          background: #333;
+        li {
+          background-color: #fff;
+          display: block;
+          list-style-type: none;
+          margin: 0 0 25px;
           overflow: hidden;
+          position: relative;
+          border-radius: $page-border-radius 0 $page-border-radius 0;
+          box-shadow: $main-box-shadow;
 
-          $header-line-height: 50px;
-          .reviewer-name {
+          $review-horizontal-indent: 20px;
+
+          .review-header {
+            padding: 0 $review-horizontal-indent;
+            background: #333;
+            overflow: hidden;
+
+            $header-line-height: 50px;
+            .reviewer-name {
+              color: #fff;
+              float: left;
+              font-size: 20px;
+              line-height: $header-line-height;
+            }
+
+            .review-date {
+              color: #aaa;
+              float: right;
+              line-height: $header-line-height;
+            }
+          }
+
+          .review-rating {
+            margin: 10px $review-horizontal-indent;
+            background: orange;
             color: #fff;
-            float: left;
-            font-size: 20px;
-            line-height: $header-line-height;
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 3px;
+            text-transform: uppercase;
+            font-weight: bold;
           }
 
-          .review-date {
-            color: #aaa;
-            float: right;
-            line-height: $header-line-height;
+          .comments {
+            margin: 0 $review-horizontal-indent 20px $review-horizontal-indent;
+            color: #666;
           }
-        }
-
-        .review-rating {
-          margin: 10px $review-horizontal-indent;
-          background: orange;
-          color: #fff;
-          display: inline-block;
-          padding: 5px 10px;
-          border-radius: 3px;
-          text-transform: uppercase;
-          font-weight: bold;
-        }
-
-        .comments {
-          margin: 0 $review-horizontal-indent 20px $review-horizontal-indent;
-          color: #666;
         }
       }
     }
