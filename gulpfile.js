@@ -17,7 +17,9 @@ gulp.task('copy', () => {
         gulp.src('*.html').pipe(gulp.dest('build/')),
         gulp.src('js/**/*.js').pipe(gulp.dest('build/js')),
         gulp.src('data/**/*').pipe(gulp.dest('build/data/')),
-        gulp.src('img/**/*').pipe(gulp.dest('build/img'))
+        gulp.src('img/**/*').pipe(gulp.dest('build/img')),
+        gulp.src('manifest.json').pipe(gulp.dest('build')),
+        gulp.src('sw.js').pipe(gulp.dest('build'))
     );
 });
 
