@@ -1,8 +1,8 @@
 @import 'variables';
 @import 'common';
 
-$responsive-sub-break-point: 600px;
-$responsive-main-break-point: 630px;
+$medium-screen-media: 'screen and (min-width: 600px)';
+$big-screen-media: 'screen and (min-width: 630px)';
 $card-border-radius: 5px;
 
 /* ====================== Restaurant Filtering ====================== */
@@ -15,7 +15,7 @@ $card-border-radius: 5px;
 
     display: none;
 
-    @media screen and (min-width: $responsive-sub-break-point) {
+    @media #{$medium-screen-media} {
       display: inline-block;
       color: white;
       font-size: 1rem;
@@ -47,7 +47,7 @@ $card-border-radius: 5px;
   padding: 30px 15px 60px;
   text-align: center;
 
-  @media screen and (min-width: $responsive-main-break-point) {
+  @media #{$big-screen-media} {
     display: flex;
     flex-flow: row wrap;
   }
@@ -67,7 +67,7 @@ $card-border-radius: 5px;
     overflow: hidden;
     box-shadow: $main-box-shadow;
 
-    @media screen and (min-width: $responsive-main-break-point) {
+    @media #{$big-screen-media} {
       width: 260px;
       height: 480px;
       margin: 10px 15px;
@@ -83,7 +83,7 @@ $card-border-radius: 5px;
       padding: 0;
       width: 100%;
 
-      @media screen and (min-width: $responsive-main-break-point) {
+      @media #{$big-screen-media} {
         height: 60%;
         object-fit: cover;
       }
@@ -92,7 +92,7 @@ $card-border-radius: 5px;
     .restaurant-details {
       padding: 10px;
 
-      @media screen and (min-width: $responsive-main-break-point) {
+      @media #{$big-screen-media} {
         position: relative;
         height: 40%;
       }
@@ -108,7 +108,7 @@ $card-border-radius: 5px;
       margin: 20px 0 10px;
       text-transform: uppercase;
 
-      @media screen and (min-width: $responsive-main-break-point) {
+      @media #{$big-screen-media} {
         margin: 0;
         height: 3em;
       }
@@ -118,7 +118,7 @@ $card-border-radius: 5px;
       margin: 0;
       font-size: 11pt;
 
-      @media screen and (min-width: $responsive-main-break-point) {
+      @media #{$big-screen-media} {
         &.neighborhood {
           height: 1.5em;
         }
