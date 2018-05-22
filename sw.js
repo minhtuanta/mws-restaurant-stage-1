@@ -40,13 +40,12 @@ function serveSiteAsset(request) {
     return caches.open(siteAssetsCache)
         .then(cache => {
             return cache.match(request.url).then(response => {
-                if (response) return response;
-
-                return fetch(request).then(response => {
+                const fetchResponse = fetch(request).then(response => {
                     cache.put(request.url, response.clone());
                     return response;
-                })
-                .catch(error => console.log(error));
+                });
+
+                return response || fetchResponse;
             });
         });
 }
