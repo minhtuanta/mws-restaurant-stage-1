@@ -21,17 +21,17 @@
 
 <body>
   <a href="#maincontent" class="skip-link">Skip to main content</a>
-  <header>
-    <nav>
+  <header role="banner">
+    <nav role="navigation">
       <h1><a href="/">Restaurant Reviews</a></h1>
     </nav>
   </header>
 
-  <main id="maincontent" tabindex="-1">
-    <section id="map-container">
+  <main role="main" id="maincontent" tabindex="-1">
+    <section role="region" id="map-container">
       <div id="map"></div>
     </section>
-    <section>
+    <section role="region">
       <div class="filter-options">
         <h2 class="filter-options-header">Filter Results</h2>
         <select id="neighborhoods-select" aria-label="Neighborhood" name="neighborhoods" onchange="updateRestaurants()">
@@ -50,7 +50,7 @@
   <script type="application/javascript" charset="utf-8" src="js/main.js"></script>
   <script async defer src="https://maps.googleapis.com/maps/api/js?libraries=places&callback=initMap"></script>
 
-  <footer id="footer">
+  <footer role="contentinfo" id="footer">
     Copyright (c) 2017 <a href="/"><strong>Restaurant Reviews</strong></a> All Rights Reserved.
   </footer>
 
