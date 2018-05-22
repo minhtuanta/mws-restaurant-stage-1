@@ -42,7 +42,8 @@ $card-border-radius: 5px;
     width: 200px;
 
     &:focus {
-      outline-color: orangered;
+      outline: 0;
+      box-shadow: 0 0 8px 3px rgba(255, 255, 255, 0.8);
     }
   }
 }
