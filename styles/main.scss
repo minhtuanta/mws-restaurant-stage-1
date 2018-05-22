@@ -5,6 +5,10 @@ $medium-screen-media: 'screen and (min-width: 600px)';
 $big-screen-media: 'screen and (min-width: 630px)';
 $card-border-radius: 5px;
 
+.skip-link:focus {
+  top: 0;
+}
+
 /* ====================== Restaurant Filtering ====================== */
 .filter-options {
   width: 100%;

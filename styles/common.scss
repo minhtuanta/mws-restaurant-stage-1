@@ -48,6 +48,16 @@ body {
   position:relative;
 }
 
+.skip-link {
+  position: absolute;
+  top: -150px;
+  left: 0;
+  background: #bf1722;
+  color: white;
+  padding: 8px;
+  z-index: 100;
+}
+
 ul, li {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 10pt;

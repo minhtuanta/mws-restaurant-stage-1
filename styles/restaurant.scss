@@ -12,6 +12,10 @@ $big-screen-content-indent: 10px;
 /* ====================== Restaurant Details ====================== */
 .inside {
 
+  .skip-link:focus {
+    top: 50px;
+  }
+
   /* ====================== Breadcrumb ====================== */
   #breadcrumb {
     list-style: none;
