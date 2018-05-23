@@ -10,4 +10,4 @@ Install dependencies: `npm install`
 
 Start dev server: `npm start`
 
-Dev server will start on port 8000. Type `localhost:8000` in browser to browse to the website.
+Dev server will start on port 8000 (`localhost:8000`).
