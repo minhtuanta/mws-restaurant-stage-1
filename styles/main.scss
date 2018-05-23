@@ -50,16 +50,13 @@ $card-border-radius: 5px;
 
 /* ====================== Restaurant Listing ====================== */
 #restaurants-list {
+  display: flex;
+  flex-flow: row wrap;
   background-color: #f3f3f3;
   list-style: outside none none;
   margin: 0;
   padding: 30px 15px 60px;
   text-align: center;
-
-  @media #{$big-screen-media} {
-    display: flex;
-    flex-flow: row wrap;
-  }
 
   li {
     display: block;
