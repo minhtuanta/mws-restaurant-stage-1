@@ -15,9 +15,7 @@ gulp.task('clean', done => {
 gulp.task('copy', () => {
     return mergeStream(
         gulp.src('*.html').pipe(gulp.dest('build/')),
-        gulp.src('js/**/*.js').pipe(gulp.dest('build/js')),
         gulp.src('data/**/*').pipe(gulp.dest('build/data/')),
-        gulp.src('img/**/*').pipe(gulp.dest('build/img')),
         gulp.src('icons/**/*').pipe(gulp.dest('build/icons')),
         gulp.src('manifest.json').pipe(gulp.dest('build')),
         gulp.src('sw.js').pipe(gulp.dest('build'))
@@ -34,9 +32,29 @@ gulp.task('css', () => {
         .pipe(gulp.dest('build/css/'));
 });
 
+gulp.task('scripts', () => {
+    return gulp.src('js/**/*.js')
+        .pipe(plugins.sourcemaps.init())
+        .pipe(plugins.babel({
+            presets: ['env']
+        }))
+        .pipe(plugins.uglify())
+        .pipe(plugins.sourcemaps.write('./'))
+        .pipe(gulp.dest('build/js'));
+});
+
+gulp.task('images', () => {
+   return gulp.src('img/**/*')
+       .pipe(plugins.imagemin({
+           progressive: true
+       }))
+       .pipe(gulp.dest('build/img'));
+});
+
 gulp.task('watch', () => {
     gulp.watch(['styles/**/*.scss'], ['css']);
-    gulp.watch(['*.html', 'js/**/*.js', 'sw.js', 'data/**/*', 'img/**/*'], ['copy']);
+    gulp.watch(['js/**/*.js'], ['scripts']);
+    gulp.watch(['*.html', 'sw.js', 'data/**/*', 'img/**/*'], ['copy']);
 });
 
 gulp.task('server', () => {
@@ -51,9 +69,9 @@ gulp.task('server', () => {
 });
 
 gulp.task('build', callback => {
-    runSequence(['css', 'copy'], callback);
+    runSequence('clean', ['css', 'scripts', 'images', 'copy'], callback);
 });
 
 gulp.task('serve', callback => {
-    runSequence('clean', 'build', ['server', 'watch'], callback);
+    runSequence('build', ['server', 'watch'], callback);
 });
