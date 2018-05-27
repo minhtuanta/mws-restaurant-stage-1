@@ -3,15 +3,18 @@
   "version": "1.0.0",
   "description": "Restaurant Review app for Mobile Web Specialist Nano Degree",
   "main": "gulpfile.js",
-  "dependencies": {},
+  "dependencies": {
+    "idb": "^2.1.2"
+  },
   "devDependencies": {
     "autoprefixer": "^8.4.1",
     "babel-core": "^6.26.3",
     "babel-preset-env": "^1.7.0",
+    "babelify": "^8.0.0",
+    "browserify": "^16.2.2",
     "del": "^3.0.0",
     "express": "^4.16.3",
     "gulp": "^3.9.1",
-    "gulp-babel": "^7.0.1",
     "gulp-define-module": "^0.1.5",
     "gulp-develop-server": "^0.5.2",
     "gulp-imagemin": "^4.1.0",
@@ -21,9 +24,10 @@
     "gulp-sourcemaps": "^2.6.4",
     "gulp-uglify": "^3.0.0",
     "gulp-util": "^3.0.8",
-    "imagemin-pngquant": "^5.1.0",
     "merge-stream": "^1.0.1",
-    "run-sequence": "^2.2.1"
+    "run-sequence": "^2.2.1",
+    "vinyl-buffer": "^1.0.1",
+    "vinyl-source-stream": "^2.0.0"
   },
   "scripts": {
     "start": "gulp serve",

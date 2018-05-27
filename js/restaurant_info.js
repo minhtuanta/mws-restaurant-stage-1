@@ -1,3 +1,5 @@
+import DBHelper from './dbhelper';
+
 let restaurant;
 var map;
 let isBreadcrumbFilled = false;

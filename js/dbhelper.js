@@ -1,3 +1,8 @@
+import idb from 'idb';
+
+// idb Promise instance
+let _idbPromise;
+
 /**
  * Common database helper functions.
  */
@@ -12,21 +17,74 @@ class DBHelper {
         return `http://localhost:${port}/restaurants/`;
     }
 
+    // Open idb promise
+    static openDatabase() {
+        if (!navigator.serviceWorker) {
+            return Promise.resolve();
+        }
+
+        return idb.open('restaurant-review', 1, upgradeDb => {
+            const store = upgradeDb.createObjectStore('restaurants', {
+                keyPath: 'id'
+            });
+        });
+    }
+
+    /**
+     * Retrieve idb Promise
+     */
+    static get IDB_PROMISE() {
+        if (!DBHelper._idbPromise) {
+            DBHelper._idbPromise = DBHelper.openDatabase();
+        }
+
+        return DBHelper._idbPromise;
+    }
+
     /**
      * Fetch all restaurants.
      */
     static fetchRestaurants(callback) {
-        fetch(DBHelper.DATABASE_URL)
-            .then(response => {
-                if (response.status === 200) {
-                    response.json()
-                        .then(data => {
-                            data.forEach(restaurant => restaurant.photograph = (restaurant.photograph ? restaurant.photograph : restaurant.id) + '.jpg');
-                            callback(null, data);
-                        })
-                } else {
-                    callback(`Request failed. Returned status of ${response.status}`, null);
-                }
+        DBHelper.IDB_PROMISE
+            .then(db => {
+                // always fetch the new restaurants info. However, we will display cache items (if any).
+                // If there's no restaurants in cached indexedDB, the fetch will return restaurants and cache them.
+                fetch(DBHelper.DATABASE_URL)
+                    .then(response => {
+                        if (response.status === 200) {
+                            response.json()
+                                .then(data => {
+                                    // Only retrieve db store if the browser supports indexed db
+                                    let store = undefined;
+                                    if (db) {
+                                        store = db.transaction('restaurants', 'readwrite')
+                                            .objectStore('restaurants')
+                                    }
+
+                                    data.forEach(restaurant => {
+                                        restaurant.photograph = (restaurant.photograph ? restaurant.photograph : restaurant.id) + '.jpg';
+                                        // only cache restaurant if the browser supports indexed DB.
+                                        if (store) {
+                                            store.put(restaurant);
+                                        }
+                                    });
+
+                                    callback(null, data);
+                                })
+                        } else {
+                            callback(`Request failed. Returned status of ${response.status}`, null);
+                        }
+                    });
+
+                // if db doesn't exist then there's no point to access db
+                if (!db) return;
+
+                db.transaction('restaurants', 'readonly')
+                    .objectStore('restaurants')
+                    .getAll().then(restaurants => {
+                        callback(null, restaurants);
+                    });
+
             });
     }
 
@@ -34,19 +92,46 @@ class DBHelper {
      * Fetch a restaurant by its ID.
      */
     static fetchRestaurantById(id, callback) {
-        // fetch all restaurants with proper error handling.
-        DBHelper.fetchRestaurants((error, restaurants) => {
-            if (error) {
-                callback(error, null);
-            } else {
-                const restaurant = restaurants.find(r => r.id == id);
-                if (restaurant) { // Got the restaurant
-                    callback(null, restaurant);
-                } else { // Restaurant does not exist in the database
-                    callback('Restaurant does not exist', null);
-                }
-            }
-        });
+        DBHelper.IDB_PROMISE
+            .then(db => {
+                // always fetch the new restaurant info. However, we will display cache items (if any).
+                // If there's no restaurants in cached indexedDB, the fetch will return the requested
+                // restaurant and cache it.
+                fetch(DBHelper.DATABASE_URL + id)
+                    .then(response => {
+                        if (response.status === 200) {
+                            response.json()
+                                .then(restaurant => {
+                                    // Only retrieve db store if the browser supports indexed db
+                                    let store = undefined;
+                                    if (db) {
+                                        store = db.transaction('restaurants', 'readwrite')
+                                            .objectStore('restaurants')
+                                    }
+
+                                    restaurant.photograph = (restaurant.photograph ? restaurant.photograph : restaurant.id) + '.jpg';
+
+                                    if (store) {
+                                        store.put(restaurant);
+                                    }
+
+                                    callback(null, restaurant);
+                                })
+                        } else {
+                            callback(`Request failed. Returned status of ${response.status}`, null);
+                        }
+                    });
+
+                // if db doesn't exist then there's no point to access db
+                if (!db) return;
+
+                db.transaction('restaurants', 'readonly')
+                    .objectStore('restaurants')
+                    .get(+id).then(restaurant => {
+                        callback(null, restaurant);
+                    });
+
+            });
     }
 
     /**
@@ -168,3 +253,5 @@ class DBHelper {
     }
 
 }
+
+module.exports = DBHelper;

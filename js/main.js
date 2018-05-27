@@ -1,8 +1,11 @@
+import DBHelper from './dbhelper';
+
 let restaurants,
     neighborhoods,
-    cuisines
-var map
-var markers = []
+    cuisines;
+var map;
+var markers = [];
+
 
 /**
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
@@ -116,7 +119,9 @@ const resetRestaurants = (restaurants) => {
     ul.innerHTML = '';
 
     // Remove all map markers
-    self.markers.forEach(m => m.setMap(null));
+    if (self.markers) {
+        self.markers.forEach(m => m.setMap(null));
+    }
     self.markers = [];
     self.restaurants = restaurants;
 }

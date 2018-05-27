@@ -5,6 +5,10 @@ const del = require('del');
 const mergeStream = require('merge-stream');
 const util = require('gulp-util');
 const runSequence = require('run-sequence');
+const browserify = require('browserify');
+const source = require('vinyl-source-stream');
+const buffer = require('vinyl-buffer');
+const babelify = require('babelify');
 
 const args = process.argv.slice(3);
 
@@ -31,21 +35,46 @@ gulp.task('css', () => {
         .pipe(gulp.dest('build/css/'));
 });
 
-gulp.task('scripts', () => {
-    return gulp.src('js/**/*.js')
+const jsBundles = {
+    'build/js/app.js': createBundle('js/app.js'),
+    'build/js/main.js': createBundle('js/main.js'),
+    'build/js/restaurant_info.js': createBundle('js/restaurant_info.js')
+};
+
+function createBundle(src) {
+    if (!src.push) {
+        src = [src];
+    }
+
+    const b = browserify({
+        entries: src,
+        debug: true
+    });
+
+    b.transform('babelify', {presets: ['env']});
+
+    return b;
+}
+
+function bundle(b, outputPath) {
+    const splitPath = outputPath.split('/');
+    const outputFile = splitPath[splitPath.length - 1];
+    const outputDir = splitPath.slice(0, -1).join('/');
+
+    return b
+        .bundle()
+        .pipe(source(outputFile))
+        .pipe(buffer())
         .pipe(plugins.sourcemaps.init())
-        .pipe(plugins.babel({
-            presets: [
-                ['env', {
-                    'targets': {
-                        'browsers': ['>0.25%']
-                    }
-                }]
-            ]
-        }))
-        .pipe(plugins.uglify())
+        .pipe(plugins.uglify()).on('error', util.log)
         .pipe(plugins.sourcemaps.write('./'))
-        .pipe(gulp.dest('build/js'));
+        .pipe(gulp.dest(outputDir));
+}
+
+gulp.task('scripts', () => {
+    return mergeStream.apply(null, Object.keys(jsBundles).map(key => {
+        return bundle(jsBundles[key], key);
+    }))
 });
 
 gulp.task('images', () => {
