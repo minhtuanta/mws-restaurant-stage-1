@@ -45,6 +45,8 @@ class DBHelper {
      * Fetch all restaurants.
      */
     static fetchRestaurants(callback) {
+        let showedRestaurants = false;
+
         DBHelper.IDB_PROMISE
             .then(db => {
                 // always fetch the new restaurants info. However, we will display cache items (if any).
@@ -55,10 +57,10 @@ class DBHelper {
                             response.json()
                                 .then(data => {
                                     // Only retrieve db store if the browser supports indexed db
-                                    let store = undefined;
+                                    let tx, store = undefined;
                                     if (db) {
-                                        store = db.transaction('restaurants', 'readwrite')
-                                            .objectStore('restaurants')
+                                        tx = db.transaction('restaurants', 'readwrite');
+                                        store = tx.objectStore('restaurants')
                                     }
 
                                     data.forEach(restaurant => {
@@ -70,6 +72,10 @@ class DBHelper {
                                     });
 
                                     callback(null, data);
+                                    showedRestaurants = true;
+                                    if (tx) {
+                                        return tx.complete;
+                                    }
                                 })
                         } else {
                             callback(`Request failed. Returned status of ${response.status}`, null);
@@ -82,9 +88,11 @@ class DBHelper {
                 db.transaction('restaurants', 'readonly')
                     .objectStore('restaurants')
                     .getAll().then(restaurants => {
-                        callback(null, restaurants);
+                        if (!showedRestaurants) {
+                            showedRestaurants = true;
+                            callback(null, restaurants);
+                        }
                     });
-
             });
     }
 
@@ -92,6 +100,8 @@ class DBHelper {
      * Fetch a restaurant by its ID.
      */
     static fetchRestaurantById(id, callback) {
+        let showedRestaurant = false;
+
         DBHelper.IDB_PROMISE
             .then(db => {
                 // always fetch the new restaurant info. However, we will display cache items (if any).
@@ -103,10 +113,10 @@ class DBHelper {
                             response.json()
                                 .then(restaurant => {
                                     // Only retrieve db store if the browser supports indexed db
-                                    let store = undefined;
+                                    let tx, store = undefined;
                                     if (db) {
-                                        store = db.transaction('restaurants', 'readwrite')
-                                            .objectStore('restaurants')
+                                        tx = db.transaction('restaurants', 'readwrite');
+                                        store = tx.objectStore('restaurants')
                                     }
 
                                     restaurant.photograph = (restaurant.photograph ? restaurant.photograph : restaurant.id) + '.jpg';
@@ -116,6 +126,10 @@ class DBHelper {
                                     }
 
                                     callback(null, restaurant);
+                                    showedRestaurant = true;
+                                    if (tx) {
+                                        return tx.complete;
+                                    }
                                 })
                         } else {
                             callback(`Request failed. Returned status of ${response.status}`, null);
@@ -128,9 +142,11 @@ class DBHelper {
                 db.transaction('restaurants', 'readonly')
                     .objectStore('restaurants')
                     .get(+id).then(restaurant => {
-                        callback(null, restaurant);
+                        if (!showedRestaurant) {
+                            callback(null, restaurant);
+                            showedRestaurant = true;
+                        }
                     });
-
             });
     }
 
