@@ -1,23 +1,45 @@
-const siteAssetsCache = 'restaurant-review-assets-v1';
+const siteStaticCache = 'restaurant-review-static-v1';
+const siteImgsCache = 'restaurant-review-imgs';
 
 const allCaches = [
-    siteAssetsCache
+    siteStaticCache,
+    siteImgsCache
 ];
 
 self.addEventListener('install', event => {
+    event.waitUntil(
+        caches.open(siteStaticCache).then(cache => {
+            return cache.addAll([
+                '/',
+                '/restaurant.html',
+                'js/app.js',
+                'js/main.js',
+                'js/restaurant_info.js',
+                'icons/icon.svg',
+                'icons/icon-144x144.png',
+                'icons/icon-152x152.png',
+                'css/main.css',
+                'css/restaurant.css'
+            ]);
+        })
+    );
 });
 
 self.addEventListener('activate', event => {
+
     event.waitUntil(
-        caches.keys().then(cacheNames => {
-            return Promise.all(
-                cacheNames.filter(cacheName => {
-                    return cacheName.startsWith('restaurant-review-') &&
-                        !allCaches.includes(cacheName);
-                })
-                .map(cacheName => caches.delete(cacheName))
-            );
-        })
+        Promise.all([
+            clients.claim(),
+            caches.keys().then(cacheNames => {
+                return Promise.all(
+                    cacheNames.filter(cacheName => {
+                        return cacheName.startsWith('restaurant-review-') &&
+                            !allCaches.includes(cacheName);
+                    })
+                        .map(cacheName => caches.delete(cacheName))
+                );
+            })
+        ])
     );
 });
 
@@ -25,8 +47,14 @@ self.addEventListener('fetch', event => {
     const requestUrl = new URL(event.request.url);
 
     if (requestUrl.origin === location.origin) {
-        event.respondWith(serveSiteAsset(event.request));
-        return;
+        if (requestUrl.pathname.startsWith('/restaurant.html')) {
+            event.respondWith(caches.match('/restaurant.html'));
+            return;
+        }
+        if (requestUrl.pathname.startsWith('/img')) {
+            event.respondWith(serveImg(event.request));
+            return;
+        }
     }
 
     event.respondWith(
@@ -36,8 +64,8 @@ self.addEventListener('fetch', event => {
     );
 });
 
-function serveSiteAsset(request) {
-    return caches.open(siteAssetsCache)
+function serveImg(request) {
+    return caches.open(siteImgsCache)
         .then(cache => {
             return cache.match(request.url).then(response => {
                 const fetchResponse = fetch(request).then(response => {
