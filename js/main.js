@@ -5,7 +5,19 @@ let restaurants,
     cuisines;
 var map;
 var markers = [];
+let lazyImageObserver = undefined;
 
+if ("IntersectionObserver" in window) {
+    lazyImageObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const lazyImage = entry.target;
+                lazyImage.src = lazyImage.dataset.src;
+                lazyImageObserver.unobserve(lazyImage);
+            }
+        })
+    });
+}
 
 /**
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
@@ -145,9 +157,12 @@ const createRestaurantHTML = (restaurant) => {
 
     const image = document.createElement('img');
     image.className = 'restaurant-img';
-    image.src = DBHelper.imageUrlForRestaurant(restaurant);
+    image.setAttribute('data-src', DBHelper.imageUrlForRestaurant(restaurant));
     image.alt = restaurant.name;
     image.title = restaurant.name;
+    if (lazyImageObserver) {
+        lazyImageObserver.observe(image);
+    }
     li.append(image);
 
     const restaurantDetails = document.createElement('div');
