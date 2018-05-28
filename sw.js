@@ -28,18 +28,16 @@ self.addEventListener('install', event => {
 self.addEventListener('activate', event => {
 
     event.waitUntil(
-        Promise.all([
-            clients.claim(),
-            caches.keys().then(cacheNames => {
-                return Promise.all(
-                    cacheNames.filter(cacheName => {
-                        return cacheName.startsWith('restaurant-review-') &&
-                            !allCaches.includes(cacheName);
-                    })
-                        .map(cacheName => caches.delete(cacheName))
-                );
-            })
-        ])
+        caches.keys().then(cacheNames => {
+            return Promise.all(
+                cacheNames.filter(cacheName => {
+                    return cacheName.startsWith('restaurant-review-') &&
+                        !allCaches.includes(cacheName);
+                }).map(cacheName => caches.delete(cacheName))
+            );
+        }).then(() => {
+            return self.clients.claim();
+        })
     );
 });
 
