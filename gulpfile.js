@@ -19,7 +19,7 @@ gulp.task('clean', done => {
 gulp.task('copy', () => {
     return mergeStream(
         gulp.src('*.html').pipe(gulp.dest('build/')),
-        gulp.src('icons/**/*').pipe(gulp.dest('build/icons')),
+        gulp.src('icons/**/*.png').pipe(gulp.dest('build/icons')),
         gulp.src('manifest.json').pipe(gulp.dest('build')),
         gulp.src('sw.js').pipe(gulp.dest('build'))
     );
