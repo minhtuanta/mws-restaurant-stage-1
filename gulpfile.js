@@ -79,9 +79,9 @@ gulp.task('scripts', () => {
 
 gulp.task('images', () => {
     return gulp.src('img/**/*')
-        .pipe(plugins.imagemin({
-            progressive: true
-        }))
+        .pipe(plugins.imagemin([
+            plugins.imagemin.jpegtran({progressive: true})
+        ]))
         .pipe(gulp.dest('build/img'));
 });
 
