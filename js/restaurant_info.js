@@ -45,10 +45,19 @@ const fetchRestaurantFromURL = (callback) => {
                 console.error(error);
                 return;
             }
+            resetRestaurant();
             fillRestaurantHTML();
             callback(null, restaurant)
         });
     }
+}
+
+function resetRestaurant() {
+    const hours = document.getElementById('restaurant-hours');
+    hours.innerHTML = '';
+
+    const reviewContainer = document.getElementById('reviews-container');
+    reviewContainer.innerHTML = '';
 }
 
 /**
@@ -115,7 +124,8 @@ const fillReviewsHTML = (reviews = self.restaurant.reviews) => {
         contentContainer.appendChild(noReviews);
         return;
     }
-    const ul = document.getElementById('reviews-list');
+    const ul = document.createElement('ul');
+    ul.id = 'reviews-list';
     reviews.forEach(review => {
         ul.appendChild(createReviewHTML(review));
     });
