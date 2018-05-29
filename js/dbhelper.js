@@ -45,7 +45,7 @@ class DBHelper {
      * Fetch all restaurants.
      */
     static fetchRestaurants(callback) {
-        let showedRestaurants = false;
+        let callbackCalled = false;
 
         DBHelper.IDB_PROMISE
             .then(db => {
@@ -72,7 +72,7 @@ class DBHelper {
                                     });
 
                                     callback(null, data);
-                                    showedRestaurants = true;
+                                    callbackCalled = true;
                                     if (tx) {
                                         return tx.complete;
                                     }
@@ -88,8 +88,8 @@ class DBHelper {
                 db.transaction('restaurants', 'readonly')
                     .objectStore('restaurants')
                     .getAll().then(restaurants => {
-                        if (!showedRestaurants) {
-                            showedRestaurants = true;
+                        if (!callbackCalled) {
+                            callbackCalled = true;
                             callback(null, restaurants);
                         }
                     });
@@ -100,7 +100,7 @@ class DBHelper {
      * Fetch a restaurant by its ID.
      */
     static fetchRestaurantById(id, callback) {
-        let showedRestaurant = false;
+        let callbackCalled = false;
 
         DBHelper.IDB_PROMISE
             .then(db => {
@@ -126,7 +126,7 @@ class DBHelper {
                                     }
 
                                     callback(null, restaurant);
-                                    showedRestaurant = true;
+                                    callbackCalled = true;
                                     if (tx) {
                                         return tx.complete;
                                     }
@@ -142,9 +142,9 @@ class DBHelper {
                 db.transaction('restaurants', 'readonly')
                     .objectStore('restaurants')
                     .get(+id).then(restaurant => {
-                        if (!showedRestaurant) {
+                        if (!callbackCalled) {
                             callback(null, restaurant);
-                            showedRestaurant = true;
+                            callbackCalled = true;
                         }
                     });
             });
