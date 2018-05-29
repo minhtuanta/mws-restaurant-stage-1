@@ -15,8 +15,6 @@ self.addEventListener('install', event => {
                 'js/app.js',
                 'js/main.js',
                 'js/restaurant_info.js',
-                'css/main.css',
-                'css/restaurant.css',
                 'icons/icon144.png'
             ]);
         })
