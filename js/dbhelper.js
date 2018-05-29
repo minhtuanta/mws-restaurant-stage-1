@@ -64,7 +64,7 @@ class DBHelper {
                                     }
 
                                     data.forEach(restaurant => {
-                                        restaurant.photograph = (restaurant.photograph ? restaurant.photograph : restaurant.id) + '.jpg';
+                                        restaurant.photograph = (restaurant.photograph ? restaurant.photograph : restaurant.id) + '.webp';
                                         // only cache restaurant if the browser supports indexed DB.
                                         if (store) {
                                             store.put(restaurant);
@@ -119,7 +119,7 @@ class DBHelper {
                                         store = tx.objectStore('restaurants')
                                     }
 
-                                    restaurant.photograph = (restaurant.photograph ? restaurant.photograph : restaurant.id) + '.jpg';
+                                    restaurant.photograph = (restaurant.photograph ? restaurant.photograph : restaurant.id) + '.webp';
 
                                     if (store) {
                                         store.put(restaurant);

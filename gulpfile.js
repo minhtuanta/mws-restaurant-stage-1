@@ -82,6 +82,11 @@ gulp.task('images', () => {
         .pipe(plugins.imagemin([
             plugins.imagemin.jpegtran({progressive: true})
         ]))
+        .pipe(plugins.webp({
+            preset: 'photo',
+            quality: 50,
+            method: 6
+        }))
         .pipe(gulp.dest('build/img'));
 });
 
