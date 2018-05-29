@@ -28,7 +28,7 @@
 
   <main role="main" id="maincontent" tabindex="-1">
     <section role="application" id="map-container">
-      <div id="map"></div>
+      <div id="map" class="hidden"></div>
     </section>
     <section role="region">
       <div class="filter-options">
@@ -40,7 +40,8 @@
           <option value="all">All Cuisines</option>
         </select>
       </div>
-      <ul id="restaurants-list"></ul>
+      <div class="loading">Loading restaurants. Please wait...</div>
+      <ul id="restaurants-list" class="hidden"></ul>
     </section>
   </main>
 

@@ -29,10 +29,18 @@ nav h1 a {
 }
 
 /* ====================== Map ====================== */
+#map-container {
+  height: 400px;
+}
+
 #map {
   height: 400px;
   width: 100%;
   background-color: #ccc;
+}
+
+.hidden {
+  display: none;
 }
 
 body,td,th,p{

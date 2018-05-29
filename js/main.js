@@ -6,6 +6,7 @@ let restaurants,
 var map;
 var markers = [];
 let lazyImageObserver = undefined;
+let showedRestaurants = false;
 
 if ("IntersectionObserver" in window) {
     lazyImageObserver = new IntersectionObserver((entries, observer) => {
@@ -86,6 +87,7 @@ const fillCuisinesHTML = (cuisines = self.cuisines) => {
  * Initialize Google map, called from HTML.
  */
 window.initMap = () => {
+    const map = document.getElementById('map');
     let loc = {
         lat: 40.722216,
         lng: -73.987501
@@ -95,13 +97,19 @@ window.initMap = () => {
         center: loc,
         scrollwheel: false
     });
-    updateRestaurants();
+    map.classList.remove('hidden');
+    if (!showedRestaurants) {
+        updateRestaurants();
+    } else {
+        addMarkersToMap();
+    }
 }
 
 /**
  * Update page and map for current restaurants.
  */
 const updateRestaurants = () => {
+    showedRestaurants = true;
     const cSelect = document.getElementById('cuisines-select');
     const nSelect = document.getElementById('neighborhoods-select');
 
@@ -129,6 +137,10 @@ const resetRestaurants = (restaurants) => {
     self.restaurants = [];
     const ul = document.getElementById('restaurants-list');
     ul.innerHTML = '';
+    ul.classList.add('hidden');
+
+    const loading = (document.getElementsByClassName('loading'))[0];
+    loading.classList.remove('hidden');
 
     // Remove all map markers
     if (self.markers) {
@@ -143,6 +155,9 @@ const resetRestaurants = (restaurants) => {
  */
 const fillRestaurantsHTML = (restaurants = self.restaurants) => {
     const ul = document.getElementById('restaurants-list');
+    const loading = (document.getElementsByClassName('loading'))[0];
+    loading.classList.add('hidden');
+    ul.classList.remove('hidden');
     restaurants.forEach(restaurant => {
         ul.append(createRestaurantHTML(restaurant));
     });
@@ -200,7 +215,7 @@ const createRestaurantHTML = (restaurant) => {
  * Add markers for current restaurants to the map.
  */
 const addMarkersToMap = (restaurants = self.restaurants) => {
-    if (self.map) {
+    if (self.map && restaurants && google) {
         restaurants.forEach(restaurant => {
             // Add marker to the map
             const marker = DBHelper.mapMarkerForRestaurant(restaurant, self.map);
