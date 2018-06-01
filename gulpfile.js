@@ -19,10 +19,18 @@ gulp.task('clean', done => {
 gulp.task('copy', () => {
     return mergeStream(
         gulp.src('*.html').pipe(gulp.dest('build/')),
-        gulp.src('icons/**/*.png').pipe(gulp.dest('build/icons')),
-        gulp.src('manifest.json').pipe(gulp.dest('build')),
-        gulp.src('sw.js').pipe(gulp.dest('build'))
+        gulp.src('icons/**/*.png').pipe(gulp.dest('build/icons'))
     );
+});
+
+gulp.task('optimize-manifest', () => {
+    return gulp.src('manifest.json')
+        .pipe(plugins.jsonminify())
+        .pipe(gulp.dest('build'));
+});
+
+gulp.task('optimize-sw', () => {
+    return bundle(createBundle('sw.js'), 'build/sw.js');
 });
 
 gulp.task('css', () => {
@@ -91,6 +99,8 @@ gulp.task('images', () => {
 });
 
 gulp.task('watch', () => {
+    gulp.watch(['manifest.json'], ['optimize-manifest']);
+    gulp.watch(['sw.js'], ['optimize-sw']);
     gulp.watch(['styles/**/*.scss'], ['css']);
     gulp.watch(['js/**/*.js'], ['scripts']);
     gulp.watch(['*.html', 'sw.js', 'data/**/*', 'img/**/*'], ['copy']);
@@ -108,7 +118,7 @@ gulp.task('server', () => {
 });
 
 gulp.task('build', callback => {
-    runSequence('clean', ['css', 'scripts', 'images', 'copy'], callback);
+    runSequence('clean', ['optimize-manifest', 'optimize-sw', 'css', 'scripts', 'images', 'copy'], callback);
 });
 
 gulp.task('serve', callback => {
