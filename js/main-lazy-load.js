@@ -238,7 +238,7 @@ showMapBtn.addEventListener('click', () => {
 
     if (!loadedMapScript) {
         let script = document.createElement('script');
-        script.setAttribute('type', 'text/javascript')
+        script.setAttribute('type', 'text/javascript');
         script.src = 'https://maps.googleapis.com/maps/api/js?libraries=places&callback=initMap';
         document.head.appendChild(script);
         loadedMapScript = true;
