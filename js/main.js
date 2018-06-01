@@ -7,7 +7,6 @@ var map;
 var markers = [];
 let lazyImageObserver = undefined;
 let showedRestaurants = false;
-let mapExpanded = false;
 let loadedMapScript = false;
 
 if ("IntersectionObserver" in window) {
@@ -163,7 +162,7 @@ const fillRestaurantsHTML = (restaurants = self.restaurants) => {
     restaurants.forEach(restaurant => {
         ul.append(createRestaurantHTML(restaurant));
     });
-    if (mapExpanded) {
+    if (loadedMapScript) {
         addMarkersToMap();
     }
 }
@@ -234,10 +233,7 @@ const addMarkersToMap = (restaurants = self.restaurants) => {
 const showMapBtn = document.getElementById('show-map-btn');
 const hideMapBtn = document.getElementById('hide-map-btn');
 
-showMapBtn.addEventListener('click', showMap);
-hideMapBtn.addEventListener('click', hideMap);
-
-function showMap() {
+showMapBtn.addEventListener('click', () => {
     const mapContainer = document.getElementById('map-container');
 
     if (!loadedMapScript) {
@@ -251,14 +247,13 @@ function showMap() {
     mapContainer.className = 'map-expanded';
     showMapBtn.className = 'map-btn hidden';
     hideMapBtn.className = 'map-btn';
-}
+});
 
-function hideMap() {
+hideMapBtn.addEventListener('click', () => {
     const mapContainer = document.getElementById('map-container');
     mapContainer.className = 'map-collapsed';
     showMapBtn.className = 'map-btn';
     hideMapBtn.className = 'map-btn hidden';
-}
-
+});
 
 updateRestaurants();

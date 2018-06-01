@@ -26,7 +26,13 @@ $big-screen-content-indent: 10px;
     width: 100%;
 
     @media #{$big-screen-media} {
-      width: $big-screen-content-width;
+      &.breadcrumb-expanded {
+        width: 100%;
+      }
+
+      &.breadcrumb-shrunk {
+        width: $big-screen-content-width;
+      }
     }
 
     /* Display list items side by side */
@@ -58,26 +64,64 @@ $big-screen-content-indent: 10px;
     }
 
     /* Add a slash symbol (/) before/behind each list item */
-    li+li:before {
+    li + li:before {
       padding: 8px;
       color: black;
       content: "/\00a0";
     }
   }
 
+  .expand-symbol:after {
+    content: "\02C5";
+
+    @media #{$big-screen-media} {
+      content: "\02C2";
+    }
+  }
+
+  .collapse-symbol:after {
+    content: "\02C4";
+
+    @media #{$big-screen-media} {
+      content: "\02C3";
+    }
+  }
+
   #map-container {
     background: darkgray none repeat scroll 0 0;
-    height: 400px;
     width: 100%;
     padding: 0;
     margin: 128px 0 0 0;
+
+    &.map-collapsed {
+      height: 0;
+      transition: height 0.3s;
+    }
+
+    &.map-expanded {
+      height: 400px;
+      transition: height 0.3s;
+    }
 
     @media #{$big-screen-media} {
       position: fixed;
       right: 0;
       top: 0;
       bottom: 0;
-      width: $big-screen-map-width;
+      width: 0;
+
+      &.map-collapsed {
+        height: unset;
+        width: 0;
+        transition: width 0.3s;
+      }
+
+      &.map-expanded {
+        height: unset;
+        width: $big-screen-map-width;
+        transition: width 0.3s;
+      }
+
       height: unset;
       margin: 0;
     }
@@ -89,11 +133,31 @@ $big-screen-content-indent: 10px;
     }
   }
 
+  .map-btn {
+    @media #{$big-screen-media} {
+      position: fixed;
+      z-index: 1000;
+      bottom: 0;
+      right: 0;
+    }
+  }
+
+  .main-content {
+    @media #{$big-screen-media} {
+      &.content-expanded {
+        width: 100%;
+      }
+
+      &.content-shrunk {
+        width: $big-screen-content-width;
+      }
+    }
+  }
+
   #restaurant-container, #reviews-container {
     padding: 0;
     margin: 0;
     @media #{$big-screen-media} {
-      width: $big-screen-content-width;
       float: left;
       clear: left;
     }
@@ -114,7 +178,7 @@ $big-screen-content-indent: 10px;
 
       #restaurant-name {
         color: #f18200;
-        font-family: Arial,sans-serif;
+        font-family: Arial, sans-serif;
         font-size: 25px;
         font-weight: 200;
         letter-spacing: 0;
@@ -227,6 +291,12 @@ $big-screen-content-indent: 10px;
 
 #footer {
   @media #{$big-screen-media} {
-    width: 50%;
+    &.footer-expanded {
+      width: 100%;
+    }
+
+    &.footer-shrunk {
+      width: 50%;
+    }
   }
 }

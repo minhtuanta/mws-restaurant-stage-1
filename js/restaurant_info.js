@@ -3,6 +3,8 @@ import DBHelper from './dbhelper';
 let restaurant;
 var map;
 let isBreadcrumbFilled = false;
+let mapExpanded = false;
+let loadedMapScript = false;
 
 /**
  * Initialize Google map, called from HTML.
@@ -203,4 +205,41 @@ fetchRestaurantFromURL((error) => {
             isBreadcrumbFilled = true;
         }
     }
+});
+
+const showMapBtn = document.getElementById('show-map-btn');
+const hideMapBtn = document.getElementById('hide-map-btn');
+const mapContainer = document.getElementById('map-container');
+const mainContent = document.getElementsByClassName('main-content');
+const breadcrumb = document.getElementById('breadcrumb');
+const footer = document.getElementById('footer');
+
+showMapBtn.addEventListener('click', () => {
+    if (!loadedMapScript) {
+        let script = document.createElement('script');
+        script.setAttribute('type', 'text/javascript')
+        script.src = 'https://maps.googleapis.com/maps/api/js?libraries=places&callback=initMap';
+        document.head.appendChild(script);
+        loadedMapScript = true;
+    }
+
+    mapContainer.className = 'map-expanded';
+    showMapBtn.className = 'map-btn hidden';
+    hideMapBtn.className = 'map-btn';
+    for (let element of mainContent) {
+        element.className = 'main-content content-shrunk'
+    }
+    breadcrumb.className = 'breadcrumb-shrunk';
+    footer.className = 'footer-shrunk';
+});
+
+hideMapBtn.addEventListener('click', () => {
+    mapContainer.className = 'map-collapsed';
+    showMapBtn.className = 'map-btn';
+    hideMapBtn.className = 'map-btn hidden';
+    for (let element of mainContent) {
+        element.className = 'main-content content-expanded'
+    }
+    breadcrumb.className = 'breadcrumb-expanded';
+    footer.className = 'footer-expanded';
 });
