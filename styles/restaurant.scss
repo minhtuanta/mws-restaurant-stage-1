@@ -24,6 +24,7 @@ $big-screen-content-indent: 10px;
     padding: 0;
     margin: 0;
     width: 100%;
+    text-align: left;
 
     @media #{$big-screen-media} {
       &.breadcrumb-expanded {
