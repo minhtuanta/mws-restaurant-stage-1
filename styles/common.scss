@@ -30,13 +30,35 @@ nav h1 a {
 
 /* ====================== Map ====================== */
 #map-container {
-  height: 400px;
+  &.map-collapsed {
+    height: 0;
+    transition: height 0.3s;
+  }
+
+  &.map-expanded {
+    height: 400px;
+    transition: height 0.3s;
+  }
 }
 
 #map {
-  height: 400px;
+  height: 100%;
   width: 100%;
   background-color: #ccc;
+}
+
+.map-btn {
+  color: #fff;
+  background-color: #0275d8;
+  font-size: 14px;
+  font-weight: bold;
+  padding: 5px;
+  border: none;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #3397DB;
+  }
 }
 
 .hidden {

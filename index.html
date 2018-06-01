@@ -27,8 +27,12 @@
   </header>
 
   <main role="main" id="maincontent" tabindex="-1">
-    <section role="application" id="map-container">
-      <div id="map" class="hidden"></div>
+    <section role="application" class="map-collapsed" id="map-container">
+      <div id="map"></div>
+    </section>
+    <section role="region">
+      <button id="show-map-btn" class="map-btn" type="button">&#xfe40; Show Map</button>
+      <button id="hide-map-btn" class="map-btn hidden" type="button">&#xfe3f; Hide Map</button>
     </section>
     <section role="region">
       <div class="filter-options">
@@ -49,7 +53,7 @@
 
   <script src="js/app.js"></script>
   <script type="application/javascript" charset="utf-8" src="js/main.js"></script>
-  <script async defer src="https://maps.googleapis.com/maps/api/js?libraries=places&callback=initMap"></script>
+  <!--<script async defer src="https://maps.googleapis.com/maps/api/js?libraries=places&callback=initMap"></script>-->
 
   <footer role="contentinfo" id="footer">
     Copyright (c) 2017 <a href="/"><strong>Restaurant Reviews</strong></a> All Rights Reserved.
