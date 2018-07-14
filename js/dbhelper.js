@@ -12,19 +12,31 @@ class DBHelper {
      * Database URL.
      * Change this to restaurants.json file location on your server.
      */
-    static get DATABASE_URL() {
+    static get API_URL() {
         const port = 1337; // Change this to your server port
-        return `http://localhost:${port}/restaurants/`;
+        return `http://localhost:${port}/`;
+    }
+
+    static get RESTAURANT_API_URL() {
+        return `${DBHelper.API_URL}restaurants/`;
+    }
+
+    static get REVIEW_API_URL() {
+        return `${DBHelper.API_URL}reviews/`;
+    }
+
+    static get RESTAURANTS_STORE_NAME() {
+        return 'restaurants';
     }
 
     // Open idb promise
-    static openDatabase() {
+    static openRestaurantsDatabase() {
         if (!navigator.serviceWorker) {
             return Promise.resolve();
         }
 
-        return idb.open('restaurant-review', 1, upgradeDb => {
-            const store = upgradeDb.createObjectStore('restaurants', {
+        return idb.open('restaurants', 1, upgradeDb => {
+            upgradeDb.createObjectStore(DBHelper.RESTAURANTS_STORE_NAME, {
                 keyPath: 'id'
             });
         });
@@ -35,7 +47,7 @@ class DBHelper {
      */
     static get IDB_PROMISE() {
         if (!DBHelper._idbPromise) {
-            DBHelper._idbPromise = DBHelper.openDatabase();
+            DBHelper._idbPromise = DBHelper.openRestaurantsDatabase();
         }
 
         return DBHelper._idbPromise;
@@ -51,42 +63,55 @@ class DBHelper {
             .then(db => {
                 // always fetch the new restaurants info. However, we will display cache items (if any).
                 // If there's no restaurants in cached indexedDB, the fetch will return restaurants and cache them.
-                fetch(DBHelper.DATABASE_URL)
-                    .then(response => {
-                        if (response.status === 200) {
-                            response.json()
+                fetch(DBHelper.RESTAURANT_API_URL)
+                    .then(restaurantsResponse => {
+                        if (restaurantsResponse.status === 200) {
+                            restaurantsResponse.json()
                                 .then(data => {
-                                    // Only retrieve db store if the browser supports indexed db
-                                    let tx, store = undefined;
-                                    if (db) {
-                                        tx = db.transaction('restaurants', 'readwrite');
-                                        store = tx.objectStore('restaurants')
-                                    }
+                                    fetch(DBHelper.REVIEW_API_URL)
+                                        .then(reviewsResponse => {
+                                            if (reviewsResponse.status === 200) {
+                                                return reviewsResponse.json();
+                                            }
+                                            else {
+                                                return [];
+                                            }
+                                        })
+                                        .then(reviews => {
+                                            // Only retrieve db store if the browser supports indexed db
+                                            let tx = undefined, store = undefined;
+                                            if (db) {
+                                                tx = db.transaction(DBHelper.RESTAURANTS_STORE_NAME, 'readwrite');
+                                                store = tx.objectStore(DBHelper.RESTAURANTS_STORE_NAME)
+                                            }
 
-                                    data.forEach(restaurant => {
-                                        restaurant.photograph = (restaurant.photograph ? restaurant.photograph : restaurant.id) + '.webp';
-                                        // only cache restaurant if the browser supports indexed DB.
-                                        if (store) {
-                                            store.put(restaurant);
-                                        }
-                                    });
+                                            data.forEach(restaurant => {
+                                                restaurant.photograph = (restaurant.photograph ? restaurant.photograph : restaurant.id) + '.webp';
+                                                restaurant.reviews = reviews.filter(review => review.restaurant_id === restaurant.id);
 
-                                    callback(null, data);
-                                    callbackCalled = true;
-                                    if (tx) {
-                                        return tx.complete;
-                                    }
+                                                // only cache restaurant if the browser supports indexed DB.
+                                                if (store) {
+                                                    store.put(restaurant);
+                                                }
+                                            });
+
+                                            callback(null, data);
+                                            callbackCalled = true;
+                                            if (tx) {
+                                                return tx.complete;
+                                            }
+                                        });
                                 })
                         } else {
-                            callback(`Request failed. Returned status of ${response.status}`, null);
+                            callback(`Request failed. Returned status of ${restaurantsResponse.status}`, null);
                         }
                     });
 
                 // if db doesn't exist then there's no point to access db
                 if (!db) return;
 
-                db.transaction('restaurants', 'readonly')
-                    .objectStore('restaurants')
+                db.transaction(DBHelper.RESTAURANTS_STORE_NAME, 'readonly')
+                    .objectStore(DBHelper.RESTAURANTS_STORE_NAME)
                     .getAll().then(restaurants => {
                         if (!callbackCalled) {
                             callbackCalled = true;
@@ -107,40 +132,52 @@ class DBHelper {
                 // always fetch the new restaurant info. However, we will display cache items (if any).
                 // If there's no restaurants in cached indexedDB, the fetch will return the requested
                 // restaurant and cache it.
-                fetch(DBHelper.DATABASE_URL + id)
-                    .then(response => {
-                        if (response.status === 200) {
-                            response.json()
+                fetch(DBHelper.RESTAURANT_API_URL + id)
+                    .then(restaurantsResponse => {
+                        if (restaurantsResponse.status === 200) {
+                            restaurantsResponse.json()
                                 .then(restaurant => {
-                                    // Only retrieve db store if the browser supports indexed db
-                                    let tx, store = undefined;
-                                    if (db) {
-                                        tx = db.transaction('restaurants', 'readwrite');
-                                        store = tx.objectStore('restaurants')
-                                    }
+                                    fetch(`${DBHelper.REVIEW_API_URL}?restaurant_id=${restaurant.id}`)
+                                        .then(reviewsResponse => {
+                                           if (reviewsResponse.status === 200) {
+                                               return reviewsResponse.json();
+                                           }
+                                           else {
+                                               return [];
+                                           }
+                                        })
+                                        .then(reviews => {
+                                            // Only retrieve db store if the browser supports indexed db
+                                            let tx, store = undefined;
+                                            if (db) {
+                                                tx = db.transaction(DBHelper.RESTAURANTS_STORE_NAME, 'readwrite');
+                                                store = tx.objectStore(DBHelper.RESTAURANTS_STORE_NAME)
+                                            }
 
-                                    restaurant.photograph = (restaurant.photograph ? restaurant.photograph : restaurant.id) + '.webp';
+                                            restaurant.photograph = (restaurant.photograph ? restaurant.photograph : restaurant.id) + '.webp';
+                                            restaurant.reviews = reviews;
 
-                                    if (store) {
-                                        store.put(restaurant);
-                                    }
+                                            if (store) {
+                                                store.put(restaurant);
+                                            }
 
-                                    callback(null, restaurant);
-                                    callbackCalled = true;
-                                    if (tx) {
-                                        return tx.complete;
-                                    }
+                                            callback(null, restaurant);
+                                            callbackCalled = true;
+                                            if (tx) {
+                                                return tx.complete;
+                                            }
+                                        });
                                 })
                         } else {
-                            callback(`Request failed. Returned status of ${response.status}`, null);
+                            callback(`Request failed. Returned status of ${restaurantsResponse.status}`, null);
                         }
                     });
 
                 // if db doesn't exist then there's no point to access db
                 if (!db) return;
 
-                db.transaction('restaurants', 'readonly')
-                    .objectStore('restaurants')
+                db.transaction(DBHelper.RESTAURANTS_STORE_NAME, 'readonly')
+                    .objectStore(DBHelper.RESTAURANTS_STORE_NAME)
                     .get(+id).then(restaurant => {
                         if (!callbackCalled) {
                             callback(null, restaurant);
@@ -267,7 +304,6 @@ class DBHelper {
         );
         return marker;
     }
-
 }
 
 module.exports = DBHelper;

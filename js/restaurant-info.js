@@ -1,10 +1,8 @@
 import DBHelper from './dbhelper';
 
-let restaurant;
-var map;
 let isBreadcrumbFilled = false;
-let mapExpanded = false;
 let loadedMapScript = false;
+let restaurantId;
 
 /**
  * Initialize Google map, called from HTML.
@@ -38,12 +36,12 @@ const fetchRestaurantFromURL = (callback) => {
         callback(null, self.restaurant)
         return;
     }
-    const id = getParameterByName('id');
-    if (!id) { // no id found in URL
-        error = 'No restaurant id in URL'
+    restaurantId = getParameterByName('id');
+    if (!restaurantId) { // no id found in URL
+        const error = 'No restaurant id in URL'
         callback(error, null);
     } else {
-        DBHelper.fetchRestaurantById(id, (error, restaurant) => {
+        DBHelper.fetchRestaurantById(restaurantId, (error, restaurant) => {
             self.restaurant = restaurant;
             if (!restaurant) {
                 console.error(error);
