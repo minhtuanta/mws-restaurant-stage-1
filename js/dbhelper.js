@@ -113,7 +113,7 @@ class DBHelper {
                 db.transaction(DBHelper.RESTAURANTS_STORE_NAME, 'readonly')
                     .objectStore(DBHelper.RESTAURANTS_STORE_NAME)
                     .getAll().then(restaurants => {
-                        if (!callbackCalled) {
+                        if (!callbackCalled && restaurants) {
                             callbackCalled = true;
                             callback(null, restaurants);
                         }
@@ -179,7 +179,7 @@ class DBHelper {
                 db.transaction(DBHelper.RESTAURANTS_STORE_NAME, 'readonly')
                     .objectStore(DBHelper.RESTAURANTS_STORE_NAME)
                     .get(+id).then(restaurant => {
-                        if (!callbackCalled) {
+                        if (!callbackCalled && restaurant) {
                             callback(null, restaurant);
                             callbackCalled = true;
                         }
@@ -303,6 +303,45 @@ class DBHelper {
             }
         );
         return marker;
+    }
+
+    /**
+     * Create review
+     */
+    static createReview(review, callback) {
+        fetch(DBHelper.REVIEW_API_URL, {
+            method: 'POST',
+            body: JSON.stringify(review)
+        }).then(response => {
+            if (response.status === 201) {
+                response.json().then(newReview => {
+                    DBHelper.IDB_PROMISE
+                        .then(db => {
+                            let tx, store = undefined;
+                            if (db) {
+                                tx = db.transaction(DBHelper.RESTAURANTS_STORE_NAME, 'readwrite');
+                                store = tx.objectStore(DBHelper.RESTAURANTS_STORE_NAME)
+                            }
+
+                            if (store) {
+                                store.get(newReview.restaurant_id).then(restaurant => {
+                                    restaurant.reviews.push(newReview);
+                                    store.put(restaurant);
+
+                                    callback(null, newReview);
+
+                                    if (tx) {
+                                        return tx.complete;
+                                    }
+                                })
+                            }
+                        })
+                });
+            }
+            else {
+                callback(`Can't create review. Returned status of ${response.status}`, null);
+            }
+        });
     }
 }
 

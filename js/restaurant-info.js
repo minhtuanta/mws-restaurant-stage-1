@@ -52,12 +52,16 @@ const fetchRestaurantFromURL = (callback) => {
             callback(null, restaurant)
         });
     }
-}
+};
 
 function resetRestaurant() {
     const hours = document.getElementById('restaurant-hours');
     hours.innerHTML = '';
 
+    resetReviews();
+}
+
+function resetReviews() {
     const reviewContainer = document.getElementById('reviews-container');
     reviewContainer.innerHTML = '';
 }
@@ -112,7 +116,7 @@ const fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hour
 /**
  * Create all reviews HTML and add them to the webpage.
  */
-const fillReviewsHTML = (reviews = self.restaurant.reviews) => {
+function fillReviewsHTML(reviews = self.restaurant.reviews) {
     const container = document.getElementById('reviews-container');
     const contentContainer = document.createElement('div');
     contentContainer.className = 'reviews-content-container';
@@ -128,6 +132,7 @@ const fillReviewsHTML = (reviews = self.restaurant.reviews) => {
     }
     const ul = document.createElement('ul');
     ul.id = 'reviews-list';
+
     reviews.forEach(review => {
         ul.appendChild(createReviewHTML(review));
     });
@@ -166,7 +171,28 @@ const createReviewHTML = (review) => {
     li.appendChild(comments);
 
     return li;
-}
+};
+
+const addReview = () => {
+    const nameInput = document.getElementById('#reviewer-name');
+    const ratingInput = document.getElementById('#review-rating');
+    const commentInput = document.getElementById('#review-comments');
+
+    DBHelper.createReview({
+        "restaurant_id": +restaurantId,
+        "name": 'Terry Ta',
+        "rating": 5,
+        "comments": 'This is a comment'
+    }, (error, newReview) => {
+        if (error) {
+            console.error(error);
+        } else {
+            self.restaurant.reviews.push(newReview);
+            resetReviews();
+            fillReviewsHTML();
+        }
+    });
+};
 
 /**
  * Add restaurant name to the breadcrumb navigation menu
@@ -192,7 +218,7 @@ const getParameterByName = (name, url) => {
     if (!results[2])
         return '';
     return decodeURIComponent(results[2].replace(/\+/g, ' '));
-}
+};
 
 fetchRestaurantFromURL((error) => {
     if (error) { // Got an error!
@@ -211,6 +237,7 @@ const mapContainer = document.getElementById('map-container');
 const mainContent = document.getElementsByClassName('main-content');
 const breadcrumb = document.getElementById('breadcrumb');
 const footer = document.getElementById('footer');
+const submitReviewBtn = document.getElementById('submit-review-btn');
 
 showMapBtn.addEventListener('click', () => {
     if (!loadedMapScript) {
@@ -240,4 +267,8 @@ hideMapBtn.addEventListener('click', () => {
     }
     breadcrumb.className = 'breadcrumb-expanded';
     footer.className = 'footer-expanded';
+});
+
+submitReviewBtn.addEventListener('click', () => {
+    addReview();
 });
