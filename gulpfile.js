@@ -46,9 +46,7 @@ gulp.task('css', () => {
 const jsBundles = {
     'build/js/app.js': createBundle('js/app.js'),
     'build/js/main.js': createBundle('js/main.js'),
-    'build/js/main-lazy-load.js': createBundle('js/main-lazy-load.js'),
-    'build/js/restaurant-info.js': createBundle('js/restaurant-info.js'),
-    'build/js/restaurant-info-lazy-load.js': createBundle('js/restaurant-info-lazy-load.js')
+    'build/js/restaurant-info.js': createBundle('js/restaurant-info.js')
 };
 
 function createBundle(src) {
