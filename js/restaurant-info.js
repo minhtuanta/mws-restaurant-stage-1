@@ -152,7 +152,8 @@ const createReviewHTML = (review) => {
 
     const date = document.createElement('div');
     date.className = 'review-date';
-    date.innerHTML = review.date;
+    const updatedDate = new Date(review.updatedAt);
+    date.innerHTML = `${updatedDate.getMonth()}/${updatedDate.getDay()}/${updatedDate.getFullYear()}`;
 
     const reviewHeader = document.createElement('div');
     reviewHeader.className = 'review-header';
