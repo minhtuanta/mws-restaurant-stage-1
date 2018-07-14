@@ -1,4 +1,4 @@
-const siteStaticCache = 'restaurant-review-static-v1';
+const siteStaticCache = 'restaurant-review-static-v2';
 const siteImgsCache = 'restaurant-review-imgs';
 
 const allCaches = [
@@ -15,7 +15,9 @@ self.addEventListener('install', event => {
                 'js/app.js',
                 'js/main.js',
                 'js/restaurant-info.js',
-                'icons/icon144.png'
+                'icons/icon144.png',
+                'css/main.css',
+                'css/restaurant.css'
             ]);
         })
     );
