@@ -133,3 +133,19 @@ article, aside, canvas, details, figcaption, figure, footer, header, hgroup, men
   text-transform: uppercase;
   clear: both;
 }
+
+.favorite-icon::after {
+  content: "\2605";
+}
+
+.not-favorite-icon:after {
+  content: "\2606";
+}
+
+.favorite-icon, .not-favorite-icon {
+  position: absolute;
+  color: #ffc107;
+  font-size: 35px;
+  line-height: 1;
+  cursor: pointer;
+}

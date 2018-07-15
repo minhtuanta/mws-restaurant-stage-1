@@ -173,6 +173,17 @@ const fillRestaurantsHTML = (restaurants = self.restaurants) => {
 const createRestaurantHTML = (restaurant) => {
     const li = document.createElement('li');
 
+    const favoriteIcon = document.createElement('span');
+    if (restaurant.is_favorite) {
+        favoriteIcon.className = 'favorite-icon';
+    } else {
+        favoriteIcon.className = 'not-favorite-icon';
+    }
+    favoriteIcon.addEventListener('click', () => {
+        toggleFavorite(favoriteIcon, restaurant);
+    });
+    li.append(favoriteIcon);
+
     const image = document.createElement('img');
     image.className = 'restaurant-img';
     image.setAttribute('data-src', DBHelper.imageUrlForRestaurant(restaurant));
@@ -213,6 +224,15 @@ const createRestaurantHTML = (restaurant) => {
     li.append(restaurantDetails);
 
     return li
+}
+
+function toggleFavorite(element, restaurant) {
+    restaurant.is_favorite = !restaurant.is_favorite;
+    if (restaurant.is_favorite) {
+        element.className = 'favorite-icon';
+    } else {
+        element.className = 'not-favorite-icon';
+    }
 }
 
 /**
