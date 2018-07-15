@@ -167,7 +167,7 @@ $big-screen-content-indent: 10px;
     padding: 0;
     margin: 0;
     @media #{$big-screen-media} {
-      float: left;
+      //float: left;
       clear: left;
     }
   }
@@ -299,7 +299,7 @@ $big-screen-content-indent: 10px;
   #review-form {
     .review-form-content-container {
       padding: 0 $content-indent;
-      margin: 0 0 20px 0;
+      margin: 10px 0;
 
       @media #{$big-screen-media} {
         padding: 0 $big-screen-content-indent;
@@ -364,7 +364,7 @@ $big-screen-content-indent: 10px;
             }
 
             select, input, textarea {
-              width: 25em;
+              width: 23em;
               display: inline-block;
             }
           }
