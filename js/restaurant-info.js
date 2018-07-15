@@ -174,26 +174,50 @@ const createReviewHTML = (review) => {
     return li;
 };
 
-const addReview = () => {
-    const nameInput = document.getElementById('#reviewer-name');
-    const ratingInput = document.getElementById('#review-rating');
-    const commentInput = document.getElementById('#review-comments');
+function addReview() {
+    const nameInput = document.getElementById('reviewer-name');
+    const ratingInput = document.getElementById('review-rating');
+    const commentInput = document.getElementById('review-comments');
+    const errorMessageElement = document.getElementById('error-message');
+    const successMessageElement = document.getElementById('success-message');
 
-    DBHelper.createReview({
+    const review = {
         "restaurant_id": +restaurantId,
-        "name": 'Terry Ta',
-        "rating": 5,
-        "comments": 'This is a comment'
-    }, (error, newReview) => {
-        if (error) {
-            console.error(error);
-        } else {
-            self.restaurant.reviews.push(newReview);
-            resetReviews();
-            fillReviewsHTML();
-        }
-    });
-};
+        "name": nameInput.value,
+        "rating": +ratingInput.value,
+        "comments": commentInput.value
+    };
+
+    if (isReviewValid(review)) {
+        errorMessageElement.className = 'hidden';
+        DBHelper.createReview({
+            "restaurant_id": +restaurantId,
+            "name": review.name,
+            "rating": +review.rating,
+            "comments": review.comments
+        }, (error, newReview) => {
+            if (error) {
+                console.error(error);
+            } else {
+                self.restaurant.reviews.push(newReview);
+                resetReviews();
+                fillReviewsHTML();
+                successMessageElement.className = '';
+            }
+        });
+    }
+    else {
+        errorMessageElement.className = '';
+        successMessageElement.className = 'hidden';
+    }
+}
+
+function isReviewValid(review) {
+    if (review.name && review.name.length > 0 && review.comments && review.comments.length > 0) {
+        return true;
+    }
+    return false;
+}
 
 /**
  * Add restaurant name to the breadcrumb navigation menu

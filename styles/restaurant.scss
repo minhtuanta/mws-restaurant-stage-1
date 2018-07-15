@@ -4,6 +4,8 @@
 $content-indent: 30px;
 $page-border-radius: 25px;
 
+$medium-screen-media: 'screen and (min-width: 500px)';
+
 $big-screen-media: 'screen and (min-width: 800px)';
 $big-screen-content-width: 50%;
 $big-screen-map-width: 100% - 50%;
@@ -11,6 +13,10 @@ $big-screen-content-indent: 10px;
 
 /* ====================== Restaurant Details ====================== */
 .inside {
+
+  #maincontent {
+    background: #fff;
+  }
 
   .skip-link:focus {
     top: 50px;
@@ -144,6 +150,8 @@ $big-screen-content-indent: 10px;
   }
 
   .main-content {
+    background: #fff;
+
     @media #{$big-screen-media} {
       &.content-expanded {
         width: 100%;
@@ -165,7 +173,6 @@ $big-screen-content-indent: 10px;
   }
 
   #restaurant-container {
-
     @media #{$big-screen-media} {
       margin: 40px 0 0 0;
     }
@@ -283,6 +290,99 @@ $big-screen-content-indent: 10px;
           .comments {
             margin: 0 $review-horizontal-indent 20px $review-horizontal-indent;
             color: #666;
+          }
+        }
+      }
+    }
+  }
+
+  #review-form {
+    .review-form-content-container {
+      padding: 0 $content-indent;
+      margin: 0 0 20px 0;
+
+      @media #{$big-screen-media} {
+        padding: 0 $big-screen-content-indent;
+      }
+
+      h2 {
+        color: #fff;
+        background: #333;
+        font-size: 20px;
+        font-weight: 300;
+        padding: 0 0 0 20px;
+        line-height: 40px;
+        margin: 0;
+      }
+
+      .form-content {
+        padding: 0;
+        margin: 0;
+        box-shadow: $main-box-shadow;
+
+        #error-message {
+          background: #ffcccc;
+          color: #800000;
+          padding: 10px
+        }
+
+        #success-message {
+          background: #ccffcc;
+          color: #008000;
+          padding: 10px;
+        }
+
+        .hidden {
+          display: none;
+        }
+
+        .input-row {
+          padding: 10px 20px 0 20px;
+
+          label, select, input, textarea {
+            display: block;
+            width: 100%;
+          }
+
+          select, input, textarea {
+            padding: 5px 0 5px 0;
+          }
+
+          input:invalid, select:invalid, textarea:invalid {
+            background-color: #ffdddd;
+          }
+
+          input:required, select:required, textarea:required {
+            border: 1px solid #333;
+          }
+
+          @media #{$medium-screen-media} {
+            label {
+              width: 6em;
+              display: inline-block;
+              vertical-align: top;
+            }
+
+            select, input, textarea {
+              width: 25em;
+              display: inline-block;
+            }
+          }
+        }
+
+        #submit-review-btn {
+          margin: 5px 0 10px 20px;
+          background: #5cb85c;
+          border: none;
+          color: #fff;
+          font-size: 14px;
+          padding: 10px;
+          border-radius: 4px;
+          cursor: pointer;
+
+          &:active {
+            color: #fff;
+            background: #000;
           }
         }
       }
