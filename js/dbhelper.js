@@ -88,6 +88,9 @@ class DBHelper {
                                             data.forEach(restaurant => {
                                                 restaurant.photograph = (restaurant.photograph ? restaurant.photograph : restaurant.id) + '.webp';
                                                 restaurant.reviews = reviews.filter(review => review.restaurant_id === restaurant.id);
+                                                if (typeof restaurant.is_favorite === 'string') {
+                                                    restaurant.is_favorite = restaurant.is_favorite === 'true';
+                                                }
 
                                                 // only cache restaurant if the browser supports indexed DB.
                                                 if (store) {
@@ -156,6 +159,9 @@ class DBHelper {
 
                                             restaurant.photograph = (restaurant.photograph ? restaurant.photograph : restaurant.id) + '.webp';
                                             restaurant.reviews = reviews;
+                                            if (typeof restaurant.is_favorite === 'string') {
+                                                restaurant.is_favorite = restaurant.is_favorite === 'true';
+                                            }
 
                                             if (store) {
                                                 store.put(restaurant);
@@ -320,7 +326,7 @@ class DBHelper {
                             let tx, store = undefined;
                             if (db) {
                                 tx = db.transaction(DBHelper.RESTAURANTS_STORE_NAME, 'readwrite');
-                                store = tx.objectStore(DBHelper.RESTAURANTS_STORE_NAME)
+                                store = tx.objectStore(DBHelper.RESTAURANTS_STORE_NAME);
                             }
 
                             if (store) {
@@ -328,20 +334,59 @@ class DBHelper {
                                     restaurant.reviews.push(newReview);
                                     store.put(restaurant);
 
-                                    callback(null, newReview);
-
                                     if (tx) {
                                         return tx.complete;
                                     }
                                 })
                             }
                         })
+
+                    if (callback) callback(null, newReview);
                 });
             }
             else {
-                callback(`Can't create review. Returned status of ${response.status}`, null);
+                if (callback) callback(`Can't create review. Returned status of ${response.status}`, null);
             }
         });
+    }
+
+    /**
+     * Update restaurant's favorite
+     */
+    static updateRestaurantFavorability(restaurantId, isFavorite, callback) {
+        fetch(`${DBHelper.RESTAURANT_API_URL}${restaurantId}/?is_favorite=${isFavorite ? 'true' : 'false'}`, {
+            method: 'PUT'
+        }).then(response => {
+            if (response.status === 200) {
+                DBHelper.IDB_PROMISE
+                    .then(db => {
+                        let tx = undefined, store = undefined;
+                        if (db) {
+                            tx = db.transaction(DBHelper.RESTAURANTS_STORE_NAME, 'readwrite');
+                            store = tx.objectStore(DBHelper.RESTAURANTS_STORE_NAME);
+                        }
+
+                        if (store) {
+                            store.get(+restaurantId).then(restaurant => {
+                                restaurant.is_favorite = isFavorite;
+                                store.put(restaurant);
+
+                                if (tx) {
+                                    return tx.complete;
+                                }
+                            })
+                        }
+                    });
+
+                if (callback) {
+                    callback(null, isFavorite);
+                }
+            } else {
+                if (callback) {
+                    callback(`Can't update restaurant's favorability. Returned status of ${response.status}`, null);
+                }
+            }
+        })
     }
 }
 

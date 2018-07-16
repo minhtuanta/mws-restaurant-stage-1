@@ -245,17 +245,6 @@ const getParameterByName = (name, url) => {
     return decodeURIComponent(results[2].replace(/\+/g, ' '));
 };
 
-fetchRestaurantFromURL((error) => {
-    if (error) { // Got an error!
-        console.error(error);
-    } else {
-        if (!isBreadcrumbFilled) {
-            fillBreadcrumb();
-            isBreadcrumbFilled = true;
-        }
-    }
-});
-
 const showMapBtn = document.getElementById('show-map-btn');
 const hideMapBtn = document.getElementById('hide-map-btn');
 const mapContainer = document.getElementById('map-container');
@@ -263,6 +252,7 @@ const mainContent = document.getElementsByClassName('main-content');
 const breadcrumb = document.getElementById('breadcrumb');
 const footer = document.getElementById('footer');
 const submitReviewBtn = document.getElementById('submit-review-btn');
+const restaurantFavorability = document.getElementById('restaurant-favorability');
 
 showMapBtn.addEventListener('click', () => {
     if (!loadedMapScript) {
@@ -296,4 +286,37 @@ hideMapBtn.addEventListener('click', () => {
 
 submitReviewBtn.addEventListener('click', () => {
     addReview();
+});
+
+restaurantFavorability.addEventListener('click', () => {
+    DBHelper.updateRestaurantFavorability(+restaurantId, !self.restaurant.is_favorite, (error, isFavorite) => {
+        if (!error) {
+            self.restaurant.is_favorite = isFavorite;
+            if (self.restaurant.is_favorite) {
+                restaurantFavorability.className = 'favorite-icon';
+            } else {
+                restaurantFavorability.className = 'not-favorite-icon';
+            }
+        }
+        else {
+            console.error(error);
+        }
+    });
+});
+
+fetchRestaurantFromURL((error) => {
+    if (error) { // Got an error!
+        console.error(error);
+    } else {
+        if (!isBreadcrumbFilled) {
+            fillBreadcrumb();
+            isBreadcrumbFilled = true;
+        }
+
+        if (self.restaurant.is_favorite) {
+            restaurantFavorability.className = 'favorite-icon';
+        } else {
+            restaurantFavorability.className = 'not-favorite-icon';
+        }
+    }
 });

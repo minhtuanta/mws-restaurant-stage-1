@@ -227,12 +227,19 @@ const createRestaurantHTML = (restaurant) => {
 }
 
 function toggleFavorite(element, restaurant) {
-    restaurant.is_favorite = !restaurant.is_favorite;
-    if (restaurant.is_favorite) {
-        element.className = 'favorite-icon';
-    } else {
-        element.className = 'not-favorite-icon';
-    }
+    DBHelper.updateRestaurantFavorability(restaurant.id, !restaurant.is_favorite, (error, isFavorite) => {
+        if (!error) {
+            restaurant.is_favorite = isFavorite;
+            if (restaurant.is_favorite) {
+                element.className = 'favorite-icon';
+            } else {
+                element.className = 'not-favorite-icon';
+            }
+        }
+        else {
+            console.error(error);
+        }
+    });
 }
 
 /**
