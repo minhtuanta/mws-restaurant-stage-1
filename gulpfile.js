@@ -44,6 +44,7 @@ gulp.task('css', () => {
 });
 
 const jsBundles = {
+    'build/js/dbhelper.js': createBundle('js/dbhelper.js'),
     'build/js/app.js': createBundle('js/app.js'),
     'build/js/main.js': createBundle('js/main.js'),
     'build/js/restaurant-info.js': createBundle('js/restaurant-info.js')

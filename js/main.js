@@ -172,12 +172,13 @@ const fillRestaurantsHTML = (restaurants = self.restaurants) => {
  */
 const createRestaurantHTML = (restaurant) => {
     const li = document.createElement('li');
+    li.id = `restaurant_${restaurant.id}`;
 
     const favoriteIcon = document.createElement('span');
     if (restaurant.is_favorite) {
-        favoriteIcon.className = 'favorite-icon';
+        favoriteIcon.className = 'icon favorite-icon';
     } else {
-        favoriteIcon.className = 'not-favorite-icon';
+        favoriteIcon.className = 'icon not-favorite-icon';
     }
     favoriteIcon.addEventListener('click', () => {
         toggleFavorite(favoriteIcon, restaurant);
@@ -227,19 +228,39 @@ const createRestaurantHTML = (restaurant) => {
 }
 
 function toggleFavorite(element, restaurant) {
-    DBHelper.updateRestaurantFavorability(restaurant.id, !restaurant.is_favorite, (error, isFavorite) => {
-        if (!error) {
-            restaurant.is_favorite = isFavorite;
-            if (restaurant.is_favorite) {
-                element.className = 'favorite-icon';
-            } else {
-                element.className = 'not-favorite-icon';
+    // if browser support SyncManager then use SyncManager
+    if ('serviceWorker' in navigator && 'SyncManager' in window) {
+        navigator.serviceWorker.ready
+            .then(sw => {
+                DBHelper.syncFavorite(sw, restaurant.id, !restaurant.is_favorite, () => {
+                    showRequestSavedMessage();
+                });
+            });
+    } else { // otherwise, call server directly
+        DBHelper.updateRestaurantFavorability(restaurant.id, !restaurant.is_favorite, (error, isFavorite) => {
+            if (!error) {
+                restaurant.is_favorite = isFavorite;
+                if (restaurant.is_favorite) {
+                    element.className = 'icon favorite-icon';
+                } else {
+                    element.className = 'icon not-favorite-icon';
+                }
             }
-        }
-        else {
-            console.error(error);
-        }
-    });
+            else {
+                console.error(error);
+            }
+        });
+    }
+}
+
+const requestSavedMessage = document.getElementById('request-saved-message');
+
+function showRequestSavedMessage() {
+    requestSavedMessage.className = 'show';
+
+    setTimeout(() => {
+        requestSavedMessage.className = 'hide';
+    }, 3000);
 }
 
 /**
@@ -285,3 +306,21 @@ hideMapBtn.addEventListener('click', () => {
 });
 
 updateRestaurants();
+
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.addEventListener('message', event => {
+        if (event.data.action === 'update-favorite') {
+            let restaurantId = event.data.restaurantId;
+            let isFavorite = event.data.isFavorite;
+            let restaurant = self.restaurants.find(obj => obj.id === +restaurantId);
+            let element = document.querySelector(`#restaurant_${restaurantId} .icon`);
+
+            restaurant.is_favorite = isFavorite;
+            if (restaurant.is_favorite) {
+                element.className = 'icon favorite-icon';
+            } else {
+                element.className = 'icon not-favorite-icon';
+            }
+        }
+    });
+}

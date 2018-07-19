@@ -1,3 +1,5 @@
+import DBHelper from './js/dbhelper';
+
 const siteStaticCache = 'restaurant-review-static-v2';
 const siteImgsCache = 'restaurant-review-imgs';
 
@@ -73,3 +75,51 @@ function serveImg(request) {
             });
         });
 }
+
+self.addEventListener('sync', event => {
+    switch (event.tag) {
+        case 'sync-favorite':
+            event.waitUntil(DBHelper.readAllRecords(DBHelper.SYNC_FAVORITE_STORE_NAME)
+                .then(favoriteRequests => {
+                    favoriteRequests.forEach(request => {
+                        DBHelper.updateRestaurantFavorability(request.restaurantId, request.isFavorite, (error, isFavorite) => {
+                            if (!error) {
+                                DBHelper.deleteRecord(DBHelper.SYNC_FAVORITE_STORE_NAME, request.restaurantId);
+                                self.clients.matchAll().then(clients => {
+                                    clients.forEach(client => {
+                                        client.postMessage({
+                                            action: 'update-favorite',
+                                            restaurantId: request.restaurantId,
+                                            isFavorite: isFavorite
+                                        })
+                                    });
+                                });
+                            }
+                        });
+                    })
+                }));
+            break;
+        case 'sync-review':
+            event.waitUntil(DBHelper.readAllRecords(DBHelper.SYNC_REVIEW_STORE_NAME)
+                .then(addReviewRequests => {
+                    addReviewRequests.forEach(request => {
+                        DBHelper.createReview(request.review, (error, newReview) => {
+                            if (error) {
+                                console.error(error);
+                            } else {
+                                DBHelper.deleteRecord(DBHelper.SYNC_REVIEW_STORE_NAME, request.id);
+                                self.clients.matchAll().then(clients => {
+                                    clients.forEach(client => {
+                                        client.postMessage({
+                                            action: 'add-review',
+                                            review: newReview
+                                        })
+                                    });
+                                });
+                            }
+                        });
+                    });
+                }));
+            break;
+    }
+});

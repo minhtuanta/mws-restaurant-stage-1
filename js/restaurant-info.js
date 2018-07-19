@@ -4,6 +4,13 @@ let isBreadcrumbFilled = false;
 let loadedMapScript = false;
 let restaurantId;
 
+const nameInput = document.getElementById('reviewer-name');
+const ratingInput = document.getElementById('review-rating');
+const commentInput = document.getElementById('review-comments');
+const errorMessageElement = document.getElementById('error-message');
+const successMessageElement = document.getElementById('success-message');
+const requestSavedMessage = document.getElementById('request-saved-message');
+
 /**
  * Initialize Google map, called from HTML.
  */
@@ -175,12 +182,6 @@ const createReviewHTML = (review) => {
 };
 
 function addReview() {
-    const nameInput = document.getElementById('reviewer-name');
-    const ratingInput = document.getElementById('review-rating');
-    const commentInput = document.getElementById('review-comments');
-    const errorMessageElement = document.getElementById('error-message');
-    const successMessageElement = document.getElementById('success-message');
-
     const review = {
         "restaurant_id": +restaurantId,
         "name": nameInput.value,
@@ -217,6 +218,14 @@ function isReviewValid(review) {
         return true;
     }
     return false;
+}
+
+function showRequestSavedMessage() {
+    requestSavedMessage.className = 'show';
+
+    setTimeout(() => {
+        requestSavedMessage.className = 'hide';
+    }, 3000);
 }
 
 /**
@@ -285,23 +294,55 @@ hideMapBtn.addEventListener('click', () => {
 });
 
 submitReviewBtn.addEventListener('click', () => {
-    addReview();
+    if ('serviceWorker' in navigator && 'SyncManager' in window) {
+        navigator.serviceWorker.ready
+            .then(sw => {
+                const review = {
+                    "restaurant_id": +restaurantId,
+                    "name": nameInput.value,
+                    "rating": +ratingInput.value,
+                    "comments": commentInput.value
+                };
+
+                if (isReviewValid(review)) {
+                    errorMessageElement.className = 'hidden';
+                    DBHelper.syncReview(sw, review, () => {
+                        showRequestSavedMessage();
+                    });
+                }
+                else {
+                    errorMessageElement.className = '';
+                    successMessageElement.className = 'hidden';
+                }
+            });
+    } else { // otherwise, call server directly
+        addReview();
+    }
 });
 
 restaurantFavorability.addEventListener('click', () => {
-    DBHelper.updateRestaurantFavorability(+restaurantId, !self.restaurant.is_favorite, (error, isFavorite) => {
-        if (!error) {
-            self.restaurant.is_favorite = isFavorite;
-            if (self.restaurant.is_favorite) {
-                restaurantFavorability.className = 'favorite-icon';
-            } else {
-                restaurantFavorability.className = 'not-favorite-icon';
+    if ('serviceWorker' in navigator && 'SyncManager' in window) {
+        navigator.serviceWorker.ready
+            .then(sw => {
+                DBHelper.syncFavorite(sw, +restaurantId, !self.restaurant.is_favorite, () => {
+                    showRequestSavedMessage();
+                });
+            });
+    } else { // otherwise, call server directly
+        DBHelper.updateRestaurantFavorability(+restaurantId, !self.restaurant.is_favorite, (error, isFavorite) => {
+            if (!error) {
+                self.restaurant.is_favorite = isFavorite;
+                if (self.restaurant.is_favorite) {
+                    restaurantFavorability.className = 'icon favorite-icon';
+                } else {
+                    restaurantFavorability.className = 'icon not-favorite-icon';
+                }
             }
-        }
-        else {
-            console.error(error);
-        }
-    });
+            else {
+                console.error(error);
+            }
+        });
+    }
 });
 
 fetchRestaurantFromURL((error) => {
@@ -320,3 +361,25 @@ fetchRestaurantFromURL((error) => {
         }
     }
 });
+
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.addEventListener('message', event => {
+        if (event.data.action === 'update-favorite') {
+            if (event.data.restaurantId === +restaurantId) {
+                self.restaurant.is_favorite = event.data.isFavorite;
+                if (self.restaurant.is_favorite) {
+                    restaurantFavorability.className = 'icon favorite-icon';
+                } else {
+                    restaurantFavorability.className = 'icon not-favorite-icon';
+                }
+            }
+        } else if (event.data.action === 'add-review') {
+            if (event.data.review.restaurant_id === +restaurantId) {
+                self.restaurant.reviews.push(event.data.review);
+                resetReviews();
+                fillReviewsHTML();
+                successMessageElement.className = '';
+            }
+        }
+    });
+}

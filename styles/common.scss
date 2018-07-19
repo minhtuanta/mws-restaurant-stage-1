@@ -149,3 +149,23 @@ article, aside, canvas, details, figcaption, figure, footer, header, hgroup, men
   line-height: 1;
   cursor: pointer;
 }
+
+#request-saved-message {
+  position: fixed;
+  left: 10px;
+  bottom: 10px;
+  background: #ccffcc;
+  color: #008000;
+  border: 1px solid #008000;
+  padding: 5px;
+
+  &.hide {
+    opacity: 0;
+    transition: opacity .5s;
+  }
+
+  &.show {
+    opacity: 1;
+    transition: opacity .5s;
+  }
+}

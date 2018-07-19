@@ -29,16 +29,32 @@ class DBHelper {
         return 'restaurants';
     }
 
+    static get SYNC_FAVORITE_STORE_NAME() {
+        return 'sync-favorite';
+    }
+
+    static get SYNC_REVIEW_STORE_NAME() {
+        return 'sync-review';
+    }
+
     // Open idb promise
     static openRestaurantsDatabase() {
-        if (!navigator.serviceWorker) {
-            return Promise.resolve();
-        }
-
         return idb.open('restaurants', 1, upgradeDb => {
-            upgradeDb.createObjectStore(DBHelper.RESTAURANTS_STORE_NAME, {
-                keyPath: 'id'
-            });
+            if (!upgradeDb.objectStoreNames.contains(DBHelper.RESTAURANTS_STORE_NAME)) {
+                upgradeDb.createObjectStore(DBHelper.RESTAURANTS_STORE_NAME, {
+                    keyPath: 'id'
+                });
+            }
+            if (!upgradeDb.objectStoreNames.contains(DBHelper.SYNC_FAVORITE_STORE_NAME)) {
+                upgradeDb.createObjectStore(DBHelper.SYNC_FAVORITE_STORE_NAME, {
+                    keyPath: 'restaurantId'
+                });
+            }
+            if (!upgradeDb.objectStoreNames.contains(DBHelper.SYNC_REVIEW_STORE_NAME)) {
+                upgradeDb.createObjectStore(DBHelper.SYNC_REVIEW_STORE_NAME, {
+                    keyPath: 'id'
+                });
+            }
         });
     }
 
@@ -387,6 +403,76 @@ class DBHelper {
                 }
             }
         })
+    }
+
+    static syncFavorite(sw, restaurantId, isFavorite, callback) {
+        let favoriteRequest = {
+            restaurantId: restaurantId,
+            isFavorite: isFavorite
+        };
+        DBHelper.IDB_PROMISE
+            .then(db => {
+                let tx = undefined, store = undefined;
+                if (db) {
+                    tx = db.transaction(DBHelper.SYNC_FAVORITE_STORE_NAME, 'readwrite');
+                    store = tx.objectStore(DBHelper.SYNC_FAVORITE_STORE_NAME);
+                }
+
+                if (store) {
+                    store.put(favoriteRequest);
+                    sw.sync.register('sync-favorite');
+                    if (callback) {
+                        callback();
+                    }
+                    if (tx) {
+                        return tx.complete;
+                    }
+                }
+            });
+    }
+
+    static syncReview(sw, review, callback) {
+        let addReviewRequest = {
+            id: new Date().toISOString(),
+            review: review
+        };
+        DBHelper.IDB_PROMISE
+            .then(db => {
+                let tx = undefined, store = undefined;
+                if (db) {
+                    tx = db.transaction(DBHelper.SYNC_REVIEW_STORE_NAME, 'readwrite');
+                    store = tx.objectStore(DBHelper.SYNC_REVIEW_STORE_NAME);
+                }
+
+                if (store) {
+                    store.put(addReviewRequest);
+                    sw.sync.register('sync-review');
+                    if (callback) {
+                        callback();
+                    }
+                    if (tx) {
+                        return tx.complete;
+                    }
+                }
+            });
+    }
+
+    static readAllRecords(storeName) {
+        return DBHelper.IDB_PROMISE.then(db => {
+            const tx = db.transaction(storeName, 'readonly');
+            const store = tx.objectStore(storeName);
+
+            return store.getAll();
+        });
+    }
+
+    static deleteRecord(storeName, id) {
+        DBHelper.IDB_PROMISE.then(db => {
+            const tx = db.transaction(storeName, 'readwrite');
+            const store = tx.objectStore(storeName);
+            store.delete(id);
+            return tx.complete;
+        });
     }
 }
 
