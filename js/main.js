@@ -175,10 +175,14 @@ const createRestaurantHTML = (restaurant) => {
     li.id = `restaurant_${restaurant.id}`;
 
     const favoriteIcon = document.createElement('span');
+    favoriteIcon.setAttribute('aria-label', 'Favorite');
+    favoriteIcon.setAttribute('role', 'checkbox');
     if (restaurant.is_favorite) {
         favoriteIcon.className = 'icon favorite-icon';
+        favoriteIcon.setAttribute('aria-checked', 'true');
     } else {
         favoriteIcon.className = 'icon not-favorite-icon';
+        favoriteIcon.setAttribute('aria-checked', 'false');
     }
     favoriteIcon.addEventListener('click', () => {
         toggleFavorite(favoriteIcon, restaurant);
@@ -242,8 +246,10 @@ function toggleFavorite(element, restaurant) {
                 restaurant.is_favorite = isFavorite;
                 if (restaurant.is_favorite) {
                     element.className = 'icon favorite-icon';
+                    element.setAttribute('aria-checked', 'true');
                 } else {
                     element.className = 'icon not-favorite-icon';
+                    element.setAttribute('aria-checked', 'false');
                 }
             }
             else {
@@ -318,8 +324,10 @@ if ('serviceWorker' in navigator) {
             restaurant.is_favorite = isFavorite;
             if (restaurant.is_favorite) {
                 element.className = 'icon favorite-icon';
+                element.setAttribute('aria-checked', 'true');
             } else {
                 element.className = 'icon not-favorite-icon';
+                element.setAttribute('aria-checked', 'false');
             }
         }
     });

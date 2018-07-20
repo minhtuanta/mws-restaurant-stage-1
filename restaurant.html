@@ -50,7 +50,7 @@
     <!-- Beginning restaurant -->
     <section class="main-content content-expanded" role="region" id="restaurant-container">
       <div class="restaurant-content-container">
-        <h1 id="restaurant-name"></h1><h1 id="restaurant-favorability"></h1>
+        <h1 id="restaurant-name"></h1><div role="checkbox" aria-checked="false" aria-label="Favorite" id="restaurant-favorability"></div>
         <img id="restaurant-img">
         <p id="restaurant-cuisine"></p>
         <p id="restaurant-address"></p>
@@ -63,7 +63,7 @@
       <div class="review-form-content-container">
         <h2>Review Restaurant</h2>
 
-        <div class="form-content">
+        <form class="form-content">
           <div id="error-message" class="hidden">
             Please fill out the require fields
           </div>
@@ -89,7 +89,7 @@
             <textarea id="review-comments" required></textarea>
           </div>
           <button id="submit-review-btn">Submit Review</button>
-        </div>
+        </form>
       </div>
     </section>
 

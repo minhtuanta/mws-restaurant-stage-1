@@ -334,8 +334,10 @@ restaurantFavorability.addEventListener('click', () => {
                 self.restaurant.is_favorite = isFavorite;
                 if (self.restaurant.is_favorite) {
                     restaurantFavorability.className = 'icon favorite-icon';
+                    restaurantFavorability.setAttribute('aria-checked', 'true');
                 } else {
                     restaurantFavorability.className = 'icon not-favorite-icon';
+                    restaurantFavorability.setAttribute('aria-checked', 'false');
                 }
             }
             else {
@@ -356,8 +358,10 @@ fetchRestaurantFromURL((error) => {
 
         if (self.restaurant.is_favorite) {
             restaurantFavorability.className = 'favorite-icon';
+            restaurantFavorability.setAttribute('aria-checked', 'true');
         } else {
             restaurantFavorability.className = 'not-favorite-icon';
+            restaurantFavorability.setAttribute('aria-checked', 'false');
         }
     }
 });
@@ -369,8 +373,10 @@ if ('serviceWorker' in navigator) {
                 self.restaurant.is_favorite = event.data.isFavorite;
                 if (self.restaurant.is_favorite) {
                     restaurantFavorability.className = 'icon favorite-icon';
+                    restaurantFavorability.setAttribute('aria-checked', 'true');
                 } else {
                     restaurantFavorability.className = 'icon not-favorite-icon';
+                    restaurantFavorability.setAttribute('aria-checked', 'false');
                 }
             }
         } else if (event.data.action === 'add-review') {
