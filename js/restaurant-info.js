@@ -293,7 +293,8 @@ hideMapBtn.addEventListener('click', () => {
     footer.className = 'footer-expanded';
 });
 
-submitReviewBtn.addEventListener('click', () => {
+submitReviewBtn.addEventListener('click', event => {
+    event.preventDefault();
     if ('serviceWorker' in navigator && 'SyncManager' in window) {
         navigator.serviceWorker.ready
             .then(sw => {
